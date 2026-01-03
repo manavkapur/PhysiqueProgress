@@ -62,4 +62,13 @@ final class LocalFileManager {
         try? FileManager.default.removeItem(at: photosDirectory())
     }
     
+    func getAllImageFileNames() -> [String] {
+        let directory = photosDirectory()
+        let files = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+        
+        return files?
+            .map{$0.lastPathComponent}
+            .sorted(by: >) ?? []
+    }
+    
 }

@@ -17,7 +17,7 @@ final class PhotoCaptureService: NSObject {
         self.completion = completion
 
         let picker = UIImagePickerController()
-        picker.sourceType = .camera
+        picker.sourceType = .photoLibrary
         picker.delegate = self
         picker.allowsEditing = false
 
