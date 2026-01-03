@@ -10,9 +10,12 @@ import UIKit
 final class CameraViewModel {
 
     private let photoService = PhotoCaptureService()
-
+    private let mlAnalyzer = MLAnalyzer()
+    
+    
     var onImageSaved: (() -> Void)?
     var onError: ((String) -> Void)?
+    var onMLResult: ((PoseMetrics) -> Void)?
 
     func openCamera(from viewController: UIViewController) {
         photoService.openCamera(from: viewController) { [weak self] image in
@@ -23,11 +26,19 @@ final class CameraViewModel {
     private func saveImage(_ image: UIImage) {
         let fileName = "progress_\(Date().timeIntervalSince1970).jpg"
 
-        if LocalFileManager.shared.saveImage(image, fileName: fileName) != nil {
-            onImageSaved?()
-        } else {
+        guard LocalFileManager.shared.saveImage(image, fileName: fileName) != nil else {
             onError?("Failed to save image")
+            return
         }
+
+        onImageSaved?()
+        
+        mlAnalyzer.analyze(image: image){ [weak self] metrics in
+            guard let metrics else {return}
+            self?.onMLResult?(metrics)
+            
+        }
+        
     }
 }
 

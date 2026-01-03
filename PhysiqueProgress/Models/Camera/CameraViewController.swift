@@ -16,12 +16,22 @@ final class CameraViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("🚀 CameraViewController appeared 1")
         title = "Track Progress"
         view.backgroundColor = .systemBackground
         setupUI()
         bindViewModel()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        #if DEBUG
+        testMLWithImage(named: "good_posture")
+        #endif
+    }
+
+
     
     private func setupUI() {
         captureButton.setTitle("Capture photo", for: .normal)
@@ -45,6 +55,12 @@ final class CameraViewController: UIViewController {
         viewModel.onError = { [weak self] message in
             self?.showAlert( message)
         }
+        
+        viewModel.onMLResult = { [weak self] metrics in
+            self?.showML(metrics)
+        }
+
+        
     }
     
     @objc private func captureTapped() {
@@ -69,6 +85,43 @@ final class CameraViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
+
+    private func showML(_ m: PoseMetrics) {
+        let message = """
+        Posture: \(Int(m.postureScore))
+        Symmetry: \(Int(m.symmetryScore))
+        Proportion: \(Int(m.proportionScore))
+        Stability: \(Int(m.stabilityScore))
+
+        Overall Score: \(Int(m.overallScore))
+        """
+
+        let alert = UIAlertController(
+            title: "Physique Analysis",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    func testMLWithImage(named name: String) {
+        guard let image = UIImage(named: name) else {
+            showAlert("Test image not found")
+            return
+        }
+
+        MLAnalyzer().analyze(image: image) { [weak self] metrics in
+            DispatchQueue.main.async {
+                guard let metrics else {
+                    self?.showAlert("No ML metrics returned")
+                    return
+                }
+                self?.showML(metrics)
+            }
+        }
+    }
+
 
 
     
