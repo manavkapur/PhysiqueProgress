@@ -12,6 +12,7 @@ final class HomeViewModel {
         case history
         case subscription
         case logout
+        case analytics
         
     }
     
@@ -32,4 +33,10 @@ final class HomeViewModel {
     func didSelectLogout() {
         onNavigate?(.logout)
     }
+    
+    func didSelectAnalytics() {
+        onNavigate?(.analytics)
+    }
+    
+    
 }

@@ -38,14 +38,22 @@ class HomeViewController: UIViewController {
             action: #selector(subscriptionTapped)
         )
         
+        let analyticsBtn = makeButton(
+            title: "Progress Analytics",
+            action: #selector(AnalyticsTapped)
+        )
+        
         let logoutBtn = makeButton(
             title: "Logout",
             action: #selector(logoutTapped)
         )
+
+        
         
         let stack = UIStackView(arrangedSubviews: [
             cameraBtb,
             historyBtb,
+            analyticsBtn,
             premiumBtn,
             logoutBtn
         ])
@@ -79,6 +87,10 @@ class HomeViewController: UIViewController {
     
     @objc private func subscriptionTapped() {
         viewModel.didSelectSubscription()
+    }
+    
+    @objc private func AnalyticsTapped() {
+        viewModel.didSelectAnalytics()
     }
     
     @objc private func logoutTapped() {
@@ -115,6 +127,12 @@ class HomeViewController: UIViewController {
                 SubscriptionViewController(),
                 animated: true
             )
+        case .analytics:
+            navigationController?.pushViewController(
+                ProgressViewController(),
+                animated: true
+            )
+
         
         case .logout:
             logout()

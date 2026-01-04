@@ -11,7 +11,7 @@ final class CameraViewModel {
 
     private let photoService = PhotoCaptureService()
     private let mlAnalyzer = MLAnalyzer()
-    
+    private let progressRepo = ProgressRepository()
     
     var onImageSaved: (() -> Void)?
     var onError: ((String) -> Void)?
@@ -35,6 +35,20 @@ final class CameraViewModel {
         
         mlAnalyzer.analyze(image: image){ [weak self] metrics in
             guard let metrics else {return}
+            
+            let entry = ProgressEntry(
+                id: UUID().uuidString,
+                imageFileName: fileName,
+                postureScore: metrics.postureScore,
+                symmetryScore: metrics.symmetryScore,
+                proportionScore: metrics.proportionScore,
+                stabilityScore: metrics.stabilityScore,
+                overallScore: metrics.overallScore,
+                date: Date()
+
+            )
+            
+            self?.progressRepo.save(entry)
             self?.onMLResult?(metrics)
             
         }
