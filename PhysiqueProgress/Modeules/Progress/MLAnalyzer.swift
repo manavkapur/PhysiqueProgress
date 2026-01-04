@@ -9,22 +9,28 @@ import UIKit
 
 final class MLAnalyzer {
 
-    private let poseDetector = PoseDetector()
+    private let detector = PoseDetector()
     private let calculator = ProgressCalculator()
 
     func analyze(
         image: UIImage,
         completion: @escaping (PoseMetrics?) -> Void
     ) {
-        poseDetector.detectPose(in: image) { observation in
+        detector.detectPose(in: image) { observation in
             guard let observation else {
-                completion(nil)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
                 return
             }
 
             let metrics = self.calculator.calculateMetrics(from: observation)
-            completion(metrics)
+
+            DispatchQueue.main.async {
+                completion(metrics)
+            }
         }
     }
 }
+
 

@@ -27,7 +27,7 @@ final class CameraViewController: UIViewController {
         super.viewDidAppear(animated)
 
         #if DEBUG
-        testMLWithImage(named: "good_posture")
+        testMLWithImage(named: "posereal")
         #endif
     }
 
@@ -56,10 +56,6 @@ final class CameraViewController: UIViewController {
             self?.showAlert( message)
         }
         
-        viewModel.onMLResult = { [weak self] metrics in
-            self?.showML(metrics)
-        }
-
         
     }
     
@@ -106,23 +102,37 @@ final class CameraViewController: UIViewController {
     }
     
     func testMLWithImage(named name: String) {
+    #if targetEnvironment(simulator)
+        showML(mockMetrics())
+        return
+    #endif
+
         guard let image = UIImage(named: name) else {
             showAlert("Test image not found")
             return
         }
 
         MLAnalyzer().analyze(image: image) { [weak self] metrics in
-            DispatchQueue.main.async {
-                guard let metrics else {
-                    self?.showAlert("No ML metrics returned")
-                    return
-                }
-                self?.showML(metrics)
+            guard let metrics else {
+                self?.showAlert("No ML metrics returned")
+                return
             }
+            self?.showML(metrics)
         }
     }
 
 
+#if DEBUG
+private func mockMetrics() -> PoseMetrics {
+    PoseMetrics(
+        postureScore: 82,
+        symmetryScore: 74,
+        proportionScore: 68,
+        stabilityScore: 80,
+        overallScore: 76
+    )
+}
+#endif
 
     
 }
