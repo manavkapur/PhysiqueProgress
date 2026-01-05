@@ -6,6 +6,20 @@
 	<array>
 		<string>com.apertix.PhysiqueProgress.refresh</string>
 	</array>
+    <key>NSCameraUsageDescription</key>
+    <string>We use the camera to capture your physique progress</string>
+    
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>physiqueprogress</string>
+        </array>
+      </dict>
+    </array>
+
+    
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

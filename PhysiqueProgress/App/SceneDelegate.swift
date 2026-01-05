@@ -89,6 +89,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillResignActive(_ scene: UIScene) {
         // Called when the scene will move from an active state to an inactive state.
         // This may occur due to temporary interruptions (ex. an incoming phone call).
+//        SecureScreenGuard.enable()
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
@@ -103,6 +104,38 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         BackgroundTaskManager.schedule()
     }
 
+
+}
+
+
+extension SceneDelegate {
+    func scene(
+        _ scene: UIScene,
+        continue userActivity: NSUserActivity
+    ) {
+        guard
+            userActivity.activityType ==
+            NSUserActivityTypeBrowsingWeb,
+            let url = userActivity.webpageURL
+        else { return }
+
+        DeepLinkManager.shared.handle(
+            url: url,
+            window: window
+        )
+    }
+
+    func scene(
+        _ scene: UIScene,
+        openURLContexts URLContexts: Set<UIOpenURLContext>
+    ) {
+        guard let url = URLContexts.first?.url else { return }
+
+        DeepLinkManager.shared.handle(
+            url: url,
+            window: window
+        )
+    }
 
 }
 
