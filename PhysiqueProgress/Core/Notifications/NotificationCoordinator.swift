@@ -20,6 +20,5 @@ final class NotificationCoordinator {
             NotificationScheduler.scheduleNotificationReminder()
         }
     }
-
 }
 
