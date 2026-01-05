@@ -89,17 +89,14 @@ final class ProgressViewController: UIViewController {
     }
 
     private func updateUIForAccess() {
-
-        tableTopToBanner.isActive = false
-        tableTopToChart.isActive = false
-
-        if isPremiumUser {
-            upgradeBanner.isHidden = true
+        if PremiumFeatureGate.canAccessPremiumFeatures(isPremium: isPremiumUser) {
+            FirebaseAnalyticsService.shared.logPremiumAnalyticsViewed()
             chartView.isHidden = false
             tableTopToChart.isActive = true
             chartView.values = viewModel.overallScores().reversed()
         } else {
-            upgradeBanner.isHidden = false
+            FirebaseAnalyticsService.shared
+                .logFreeAnalyticsViewed()
             chartView.isHidden = true
             tableTopToBanner.isActive = true
         }

@@ -7,6 +7,10 @@
 
 import Foundation
 
+import FirebaseFirestore
+import FirebaseAuth
+
+
 final class ProgressRepository {
     private let fileName = "progress_metrics.json"
     
@@ -15,6 +19,8 @@ final class ProgressRepository {
         var all = loadAll()
         all.append(entry)
         persist(all)
+        
+        syncToFirebase(entry)
     }
     
     func loadAll() ->[ProgressEntry]{
@@ -39,7 +45,24 @@ final class ProgressRepository {
         
         return document.appendingPathComponent(fileName)
     }
-
-
     
+    private func syncToFirebase(_ entry: ProgressEntry) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+
+        let data: [String: Any] = [
+            "posture": entry.postureScore,
+            "symmetry": entry.symmetryScore,
+            "proportion": entry.proportionScore,
+            "stability": entry.stabilityScore,
+            "overall": entry.overallScore,
+            "date": Timestamp(date: entry.date)
+        ]
+
+        Firestore.firestore()
+            .collection("users")
+            .document(uid)
+            .collection("progress")
+            .addDocument(data: data)
+    }
+
 }

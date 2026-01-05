@@ -6,6 +6,7 @@
 //
 
 import StoreKit
+import FirebaseAuth
 
 enum PurchaseError: Error {
     case failedVerification
@@ -62,6 +63,8 @@ final class SubscriptionManager {
         case .success(let verification):
             let transaction = try verify(verification)
             await transaction.finish()
+            
+            syncPremiumToFirebase(true)
             return true
 
         case .userCancelled, .pending:
@@ -78,6 +81,8 @@ final class SubscriptionManager {
             if case .verified(let transaction) = result,
                productIDs.contains(transaction.productID),
                transaction.revocationDate == nil {
+                
+                syncPremiumToFirebase(true)
                 return true
             }
         }
@@ -110,4 +115,9 @@ final class SubscriptionManager {
         await hasPremiumAccess()
     }
 
+    private func syncPremiumToFirebase(_ isPremium: Bool){
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        FirebaseSubscriptionService()
+            .updatePremiumStatus(userId: uid, isPremium: isPremium)
+    }
 }
