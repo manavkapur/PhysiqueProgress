@@ -5,6 +5,10 @@
 //  Created by Manav Kapur on 04/01/26.
 //
 
+import Foundation
+import UIKit
+
+
 final class ProgressViewModel {
     
     private let repository = ProgressRepository()

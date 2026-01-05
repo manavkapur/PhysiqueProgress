@@ -6,21 +6,21 @@
 
 
 
-import FirebaseAnalytics
+import FirebaseFirestore
 
-final class FirebaseAnalyticsService {
+final class FirebaseSubscriptionService {
 
-    static let shared = FirebaseAnalyticsService()
+    private let db = Firestore.firestore()
 
-    func logPremiumPurchase() {
-        Analytics.logEvent("premium_purchase", parameters: nil)
-    }
-
-    func logPremiumAnalyticsViewed() {
-        Analytics.logEvent("premium_analytics_viewed", parameters: nil)
-    }
-
-    func logFreeAnalyticsViewed() {
-        Analytics.logEvent("free_analytics_viewed", parameters: nil)
+    func updatePremiumStatus(
+        userId: String,
+        isPremium: Bool
+    ) {
+        db.collection("users")
+            .document(userId)
+            .setData([
+                "isPremium": isPremium,
+                "updatedAt": Timestamp()
+            ], merge: true)
     }
 }
