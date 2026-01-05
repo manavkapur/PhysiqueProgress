@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.apertix.PhysiqueProgress.refresh</string>
+    </array>
+    
     <key>NSCameraUsageDescription</key>
     <string>We use the camera to capture your physique progress</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
