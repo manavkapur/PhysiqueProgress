@@ -50,6 +50,7 @@ final class LoginViewController: UIViewController {
 
     private func bindViewModel() {
         viewModel.onLoginSuccess = { [weak self] in
+            NotificationCoordinator.shared.setupAfterLogin()
             self?.switchToHome()
         }
 
