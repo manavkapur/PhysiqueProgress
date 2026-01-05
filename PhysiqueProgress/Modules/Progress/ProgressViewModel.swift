@@ -28,5 +28,18 @@ final class ProgressViewModel {
         return total / Double(entries.count)
     }
     
+    func overallScores() -> [Double] {
+        entries.map { $0.overallScore }
+    }
+
+    func dates() -> [Date] {
+        entries.map { $0.date }
+    }
+
+    func improvement() -> Double {
+        guard entries.count >= 2 else { return 0 }
+        return entries.first!.overallScore - entries.last!.overallScore
+    }
+
     
 }
