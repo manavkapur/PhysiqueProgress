@@ -11,10 +11,36 @@
 		33076D642F05D583003AA3C1 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 33076D632F05D583003AA3C1 /* FirebaseFirestore */; };
 		33076D662F05D583003AA3C1 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 33076D652F05D583003AA3C1 /* FirebaseMessaging */; };
 		33076EB92F0B4CEA003AA3C1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 33076EB82F0B4CEA003AA3C1 /* FirebaseAnalytics */; };
+		33076EE32F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 33076EDC2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		33076EE12F0B86CD003AA3C1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 33076D312F059069003AA3C1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 33076EDB2F0B86CD003AA3C1;
+			remoteInfo = PhysiqueProgressNotificationService;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		33076EE82F0B86CE003AA3C1 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				33076EE32F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		33076D392F059069003AA3C1 /* PhysiqueProgress.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhysiqueProgress.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33076EDC2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PhysiqueProgressNotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -25,6 +51,13 @@
 			);
 			target = 33076D382F059069003AA3C1 /* PhysiqueProgress */;
 		};
+		33076EE72F0B86CE003AA3C1 /* Exceptions for "PhysiqueProgressNotificationService" folder in "PhysiqueProgressNotificationService" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 33076EDB2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -34,6 +67,14 @@
 				33076D4B2F05906A003AA3C1 /* Exceptions for "PhysiqueProgress" folder in "PhysiqueProgress" target */,
 			);
 			path = PhysiqueProgress;
+			sourceTree = "<group>";
+		};
+		33076EDD2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				33076EE72F0B86CE003AA3C1 /* Exceptions for "PhysiqueProgressNotificationService" folder in "PhysiqueProgressNotificationService" target */,
+			);
+			path = PhysiqueProgressNotificationService;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -50,6 +91,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33076ED92F0B86CD003AA3C1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -57,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				33076D3B2F059069003AA3C1 /* PhysiqueProgress */,
+				33076EDD2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */,
 				33076D3A2F059069003AA3C1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +114,7 @@
 			isa = PBXGroup;
 			children = (
 				33076D392F059069003AA3C1 /* PhysiqueProgress.app */,
+				33076EDC2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -79,10 +129,12 @@
 				33076D352F059069003AA3C1 /* Sources */,
 				33076D362F059069003AA3C1 /* Frameworks */,
 				33076D372F059069003AA3C1 /* Resources */,
+				33076EE82F0B86CE003AA3C1 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				33076EE22F0B86CD003AA3C1 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				33076D3B2F059069003AA3C1 /* PhysiqueProgress */,
@@ -98,6 +150,28 @@
 			productReference = 33076D392F059069003AA3C1 /* PhysiqueProgress.app */;
 			productType = "com.apple.product-type.application";
 		};
+		33076EDB2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33076EE42F0B86CE003AA3C1 /* Build configuration list for PBXNativeTarget "PhysiqueProgressNotificationService" */;
+			buildPhases = (
+				33076ED82F0B86CD003AA3C1 /* Sources */,
+				33076ED92F0B86CD003AA3C1 /* Frameworks */,
+				33076EDA2F0B86CD003AA3C1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				33076EDD2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */,
+			);
+			name = PhysiqueProgressNotificationService;
+			packageProductDependencies = (
+			);
+			productName = PhysiqueProgressNotificationService;
+			productReference = 33076EDC2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -109,6 +183,9 @@
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					33076D382F059069003AA3C1 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					33076EDB2F0B86CD003AA3C1 = {
 						CreatedOnToolsVersion = 16.4;
 					};
 				};
@@ -131,12 +208,20 @@
 			projectRoot = "";
 			targets = (
 				33076D382F059069003AA3C1 /* PhysiqueProgress */,
+				33076EDB2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		33076D372F059069003AA3C1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33076EDA2F0B86CD003AA3C1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -153,7 +238,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33076ED82F0B86CD003AA3C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		33076EE22F0B86CD003AA3C1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 33076EDB2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */;
+			targetProxy = 33076EE12F0B86CD003AA3C1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		33076D4D2F05906A003AA3C1 /* Debug */ = {
@@ -335,6 +435,56 @@
 			};
 			name = Release;
 		};
+		33076EE52F0B86CE003AA3C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LZRFT54CXM;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PhysiqueProgressNotificationService/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PhysiqueProgressNotificationService;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.apertix.PhysiqueProgress.PhysiqueProgressNotificationService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		33076EE62F0B86CE003AA3C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LZRFT54CXM;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PhysiqueProgressNotificationService/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PhysiqueProgressNotificationService;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.apertix.PhysiqueProgress.PhysiqueProgressNotificationService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -352,6 +502,15 @@
 			buildConfigurations = (
 				33076D4D2F05906A003AA3C1 /* Debug */,
 				33076D4E2F05906A003AA3C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		33076EE42F0B86CE003AA3C1 /* Build configuration list for PBXNativeTarget "PhysiqueProgressNotificationService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33076EE52F0B86CE003AA3C1 /* Debug */,
+				33076EE62F0B86CE003AA3C1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
