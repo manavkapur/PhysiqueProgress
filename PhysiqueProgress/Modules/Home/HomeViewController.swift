@@ -82,15 +82,22 @@ class HomeViewController: UIViewController {
     }
     
     @objc private func historyTapped() {
-        viewModel.didSelectHistory()
-    }
+        authenticateAndProceed(
+            reason: "Unlock your progress history"
+        ) { [weak self] in
+            self?.viewModel.didSelectHistory()
+        }    }
     
     @objc private func subscriptionTapped() {
         viewModel.didSelectSubscription()
     }
     
     @objc private func AnalyticsTapped() {
-        viewModel.didSelectAnalytics()
+        authenticateAndProceed(
+            reason: "Unlock your progress analytics"
+        ) { [weak self] in
+            self?.viewModel.didSelectAnalytics()
+        }
     }
     
     @objc private func logoutTapped() {
@@ -150,5 +157,19 @@ class HomeViewController: UIViewController {
         
         sceneDelegate.switchToAuth()
     }
+    
+    private func authenticateAndProceed(
+        reason: String,
+        onSuccess: @escaping () -> Void
+    ) {
+        BiometricAuthManager.authenticate(reason: reason) { success in
+            DispatchQueue.main.async {
+                if success {
+                    onSuccess()
+                }
+            }
+        }
+    }
+
 
 }
