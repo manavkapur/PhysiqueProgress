@@ -108,8 +108,11 @@ extension ProgressViewController: UITableViewDataSource {
 
     private func updateUIForAccess() {
         if PremiumFeatureGate.canAccessPremiumFeatures(isPremium: isPremiumUser) {
+            FirebaseAnalyticsService.shared.logPremiumAnalyticsViewed()
             chartView.isHidden = false
         } else {
+            FirebaseAnalyticsService.shared
+                .logFreeAnalyticsViewed()
             chartView.isHidden = true
             showUpgradeBanner()
         }

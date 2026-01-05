@@ -10,6 +10,7 @@
 		33076D622F05D583003AA3C1 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 33076D612F05D583003AA3C1 /* FirebaseAuth */; };
 		33076D642F05D583003AA3C1 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 33076D632F05D583003AA3C1 /* FirebaseFirestore */; };
 		33076D662F05D583003AA3C1 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 33076D652F05D583003AA3C1 /* FirebaseMessaging */; };
+		33076EB92F0B4CEA003AA3C1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 33076EB82F0B4CEA003AA3C1 /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 			files = (
 				33076D662F05D583003AA3C1 /* FirebaseMessaging in Frameworks */,
 				33076D622F05D583003AA3C1 /* FirebaseAuth in Frameworks */,
+				33076EB92F0B4CEA003AA3C1 /* FirebaseAnalytics in Frameworks */,
 				33076D642F05D583003AA3C1 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -90,6 +92,7 @@
 				33076D612F05D583003AA3C1 /* FirebaseAuth */,
 				33076D632F05D583003AA3C1 /* FirebaseFirestore */,
 				33076D652F05D583003AA3C1 /* FirebaseMessaging */,
+				33076EB82F0B4CEA003AA3C1 /* FirebaseAnalytics */,
 			);
 			productName = PhysiqueProgress;
 			productReference = 33076D392F059069003AA3C1 /* PhysiqueProgress.app */;
@@ -381,6 +384,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 33076D602F05D583003AA3C1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
+		};
+		33076EB82F0B4CEA003AA3C1 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 33076D602F05D583003AA3C1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
