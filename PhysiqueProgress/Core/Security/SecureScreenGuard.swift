@@ -48,7 +48,6 @@ final class SecureScreenGuard {
         overlayWindow = window
     }
 
-
     @objc private static func appDidBecomeActive() {
         overlayWindow?.isHidden = true
         overlayWindow = nil

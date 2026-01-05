@@ -10,6 +10,10 @@ import Foundation
 import UIKit
 
 
+import Foundation
+import UIKit
+
+
 final class ProgressViewModel {
     
     private let repository = ProgressRepository()
