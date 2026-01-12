@@ -48,14 +48,19 @@ final class CameraViewController: UIViewController {
     }
     
     private func bindViewModel() {
-        viewModel.onImageSaved = { [weak self] in
-            self?.showSuccess()
-        }
+//        viewModel.onImageSaved = { [weak self] in
+//            print("Image saved callback")
+//            self?.showSuccess()
+//        }
         
         viewModel.onError = { [weak self] message in
             self?.showAlert( message)
         }
-        
+        viewModel.onMLResult = { [weak self] metrics in
+            print("ML RESULT CALLBACK RECEIVED")
+            self?.showML(metrics)
+        }
+
         
     }
     
@@ -102,10 +107,10 @@ final class CameraViewController: UIViewController {
     }
     
     func testMLWithImage(named name: String) {
-    #if targetEnvironment(simulator)
-        showML(mockMetrics())
-        return
-    #endif
+//    #if targetEnvironment(simulator)
+//        showML(mockMetrics())
+//        return
+//    #endif
 
         guard let image = UIImage(named: name) else {
             showAlert("Test image not found")
@@ -120,19 +125,30 @@ final class CameraViewController: UIViewController {
             self?.showML(metrics)
         }
     }
+    
+    private func showMLResult(_ score: Double) {
+        let alert = UIAlertController(
+            title: "ML Analysis Complete",
+            message: "Posture Score: \(Int(score))",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
 
 
-#if DEBUG
-private func mockMetrics() -> PoseMetrics {
-    PoseMetrics(
-        postureScore: 82,
-        symmetryScore: 74,
-        proportionScore: 68,
-        stabilityScore: 80,
-        overallScore: 76
-    )
-}
-#endif
+
+//#if DEBUG
+//private func mockMetrics() -> PoseMetrics {
+//    PoseMetrics(
+//        postureScore: 82,
+//        symmetryScore: 74,
+//        proportionScore: 68,
+//        stabilityScore: 80,
+//        overallScore: 76
+//    )
+//}
+//#endif
 
     
 }

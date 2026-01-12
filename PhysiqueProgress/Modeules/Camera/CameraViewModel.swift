@@ -27,18 +27,21 @@ final class CameraViewModel {
         let fileName = "progress_\(Date().timeIntervalSince1970).jpg"
 
         guard LocalFileManager.shared.saveImage(image, fileName: fileName) != nil else {
-            onError?("Failed to save image")
+            DispatchQueue.main.async {
+                self.onError?("Failed to save image")
+            }
             return
         }
 
-        onImageSaved?()
-        
-        mlAnalyzer.analyze(image: image){ [weak self] metrics in
-            guard let metrics else {return}
-            self?.onMLResult?(metrics)
-            
+        mlAnalyzer.analyze(image: image) { [weak self] metrics in
+            guard let self, let metrics else { return }
+
+            DispatchQueue.main.async {
+                self.onMLResult?(metrics)   // ✅ only one alert now
+            }
         }
-        
     }
+
+
 }
 
