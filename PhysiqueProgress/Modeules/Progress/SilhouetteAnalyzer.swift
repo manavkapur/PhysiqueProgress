@@ -2,71 +2,136 @@
 //  SilhouetteAnalyzer.swift
 //  PhysiqueProgress
 //
-//  Created by Manav Kapur on 12/01/26.
-//
 
-import CoreVideo
 import UIKit
 
 struct SilhouetteMetrics {
-    let shoulderWidth: Double
-    let waistWidth: Double
-    let hipWidth: Double
-    let upperArea: Double
-    let lowerArea: Double
+    let shoulderWidth: CGFloat
+    let chestWidth: CGFloat
+    let waistWidth: CGFloat
+    let hipWidth: CGFloat
+    let thighWidth: CGFloat
+    
+    let bodyArea: CGFloat
+    let torsoArea: CGFloat
+    let bodyHeight: CGFloat
 }
 
 final class SilhouetteAnalyzer {
 
-    func analyze(mask: CVPixelBuffer) -> SilhouetteMetrics {
+    func analyze(mask: CGImage) -> SilhouetteMetrics? {
+        guard let pixelData = mask.dataProvider?.data,
+              let data = CFDataGetBytePtr(pixelData) else { return nil }
 
-        CVPixelBufferLockBaseAddress(mask, .readOnly)
-        defer { CVPixelBufferUnlockBaseAddress(mask, .readOnly) }
+        let width = mask.width
+        let height = mask.height
+        let bytesPerRow = mask.bytesPerRow
+        let bytesPerPixel = 4
 
-        let width = CVPixelBufferGetWidth(mask)
-        let height = CVPixelBufferGetHeight(mask)
-        let base = CVPixelBufferGetBaseAddress(mask)!.assumingMemoryBound(to: UInt8.self)
+        func isBodyPixel(row: UnsafePointer<UInt8>, x: Int) -> Bool {
+            let offset = x * bytesPerPixel
 
-        func bodyWidth(at row: Int) -> Double {
-            var left = width, right = 0
+            let r = row[offset]
+            let g = row[offset + 1]
+            let b = row[offset + 2]
 
-            for x in 0..<width {
-                if base[row * width + x] > 0 {
-                    left = min(left, x)
-                    right = max(right, x)
+            // convert to brightness
+            let brightness = (Int(r) + Int(g) + Int(b)) / 3
+
+            return brightness > 30   // body is light, background is dark
+        }
+
+
+        func bodyWidth(at percent: CGFloat, band: CGFloat = 0.015) -> CGFloat {
+            let centerY = Int(CGFloat(height) * percent)
+            let bandPx = Int(CGFloat(height) * band)
+
+            var widths: [CGFloat] = []
+
+            for y in (centerY - bandPx)...(centerY + bandPx) {
+                guard y >= 0 && y < height else { continue }
+                let row = data + y * bytesPerRow
+
+                var left = -1
+                var right = -1
+
+                for x in 0..<width {
+                    if isBodyPixel(row: row, x: x) { left = x; break }
+                }
+
+                for x in stride(from: width - 1, through: 0, by: -1) {
+                    if isBodyPixel(row: row, x: x) { right = x; break }
+                }
+
+                if left != -1 && right != -1 {
+                    widths.append(CGFloat(right - left))
                 }
             }
 
-            return left < right ? Double(right - left) : 0
+            return widths.isEmpty ? 0 : widths.reduce(0, +) / CGFloat(widths.count)
         }
 
-        // vertical sampling bands
-        let shoulderRow = Int(Double(height) * 0.28)
-        let waistRow    = Int(Double(height) * 0.48)
-        let hipRow      = Int(Double(height) * 0.58)
 
-        let shoulder = bodyWidth(at: shoulderRow)
-        let waist    = bodyWidth(at: waistRow)
-        let hip      = bodyWidth(at: hipRow)
+        var bodyPixels: CGFloat = 0
+        var torsoPixels: CGFloat = 0
 
-        var upperArea = 0.0
-        var lowerArea = 0.0
+        let torsoStart = Int(CGFloat(height) * 0.18)
+        let torsoEnd   = Int(CGFloat(height) * 0.52)
 
         for y in 0..<height {
+            let row = data + y * bytesPerRow
             for x in 0..<width {
-                if base[y * width + x] > 0 {
-                    if y < height / 2 { upperArea += 1 }
-                    else { lowerArea += 1 }
+
+                let offset = x * bytesPerPixel
+                let r = row[offset]
+                let g = row[offset + 1]
+                let b = row[offset + 2]
+
+                #if DEBUG
+                // 🧪 TEMP DEBUG — print first 10 pixels of middle row
+                if y == height / 2 && x < 10 {
+                    print("PIXEL", x, r, g, b)
+                }
+                #endif
+
+                
+                if isBodyPixel(row: row, x: x) {
+                    bodyPixels += 1
+                    if y >= torsoStart && y <= torsoEnd {
+                        torsoPixels += 1
+                    }
                 }
             }
         }
+
+
+        let shoulder = bodyWidth(at: 0.25)
+        let chest    = bodyWidth(at: 0.32)
+        let waist    = bodyWidth(at: 0.55)
+        let hip      = bodyWidth(at: 0.63)
+        let thigh    = bodyWidth(at: 0.72)
+
+        print("""
+        ---- WIDTH DEBUG ----
+        Shoulder: \(shoulder)
+        Chest:    \(chest)
+        Waist:    \(waist)
+        Hip:      \(hip)
+        Thigh:    \(thigh)
+        ---------------------
+        """)
 
         return SilhouetteMetrics(
             shoulderWidth: shoulder,
+            chestWidth: chest,
             waistWidth: waist,
             hipWidth: hip,
-            upperArea: upperArea,
-            lowerArea: lowerArea
+            thighWidth: thigh,
+            bodyArea: bodyPixels,
+            torsoArea: torsoPixels,
+            bodyHeight: CGFloat(height)
         )
+
+
     }
 }

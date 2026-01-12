@@ -4,6 +4,8 @@
 <dict>
     <key>NSCameraUsageDescription</key>
     <string>We use the camera to capture your physique progress</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>PhysiqueProgress saves analysis images for debugging and progress comparison</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -3,7 +3,7 @@ import Vision
 struct PoseMetrics {
     let postureScore: Double
     let symmetryScore: Double
-    let proportionScore: Double
+    let proportionScore: Double   // now = physique score
     let stabilityScore: Double
     let overallScore: Double
 }
@@ -12,8 +12,9 @@ final class ProgressCalculator {
 
     private var lastPhysiqueScore: Double?
 
+    // 🔥 MAIN ENTRY — physique comes from silhouette engine now
     func calculateMetrics(from observation: VNHumanBodyPoseObservation,
-                          silhouette: SilhouetteMetrics) -> PoseMetrics {
+                          physiqueScore: Double) -> PoseMetrics {
 
         guard let p = try? observation.recognizedPoints(.all) else {
             return zeroMetrics()
@@ -23,33 +24,30 @@ final class ProgressCalculator {
         let symmetry = min(max(symmetryScore(p), 0), 100)
         let stability = min(max(stabilityScore(p), 0), 100)
 
-
-        var physique = physiqueScore(from: silhouette)
-        
+        // 🔹 Smooth physique
+        var physique = physiqueScore
         if let last = lastPhysiqueScore {
             physique = (physique * 0.8) + (last * 0.2)
         }
-
         lastPhysiqueScore = physique
-   // 🔥 main driver
 
+        // 🔥 FINAL OVERALL (physique-dominant)
         var overall =
-            (physique * 0.75) +
-            (posture * 0.08) +
-            (symmetry * 0.09) +
-            (stability * 0.08)
+            (physique * 0.60) +
+            (posture * 0.15) +
+            (symmetry * 0.15) +
+            (stability * 0.10)
 
-        // Soft limiter: posture can't fake a big physique jump
+        // Soft limiter: posture can't fake physique
         overall = min(overall, physique + 10)
 
         // No perfect humans
         overall = min(overall, 92)
 
-
         return PoseMetrics(
             postureScore: posture,
             symmetryScore: symmetry,
-            proportionScore: physique,
+            proportionScore: physique,   // 🔥 physique lives here now
             stabilityScore: stability,
             overallScore: overall
         )
@@ -59,7 +57,7 @@ final class ProgressCalculator {
         PoseMetrics(postureScore: 0, symmetryScore: 0, proportionScore: 0, stabilityScore: 0, overallScore: 0)
     }
 
-    // MARK: - POSTURE (alignment only)
+    // MARK: - POSTURE
 
     private func postureScore(_ p: [VNHumanBodyPoseObservation.JointName: VNRecognizedPoint]) -> Double {
 
@@ -75,7 +73,7 @@ final class ProgressCalculator {
         let drift = abs(nose.x - shoulderMid) + abs(shoulderMid - hipMid)
         let score = 1 - min(drift * 3.0, 1)
 
-        return 40 + score * 50   // 40–90 range
+        return 40 + score * 50
     }
 
     // MARK: - SYMMETRY
@@ -97,32 +95,8 @@ final class ProgressCalculator {
         let avg = diffs.reduce(0, +) / Double(diffs.count)
         let score = 1 - min(avg * 4.0, 1)
 
-        return 45 + score * 45   // 45–90 range
+        return 45 + score * 45
     }
-
-    // MARK: - PROPORTION (FIXED — NO MORE 100s)
-
-    func physiqueScore(from s: SilhouetteMetrics) -> Double {
-
-        guard s.waistWidth > 0, s.hipWidth > 0, s.upperArea > 1000  else { return 30 }
-
-        let vTaper = s.shoulderWidth / s.waistWidth
-        let torsoBalance = s.shoulderWidth / s.hipWidth
-        let upperMass = s.upperArea / max(s.lowerArea, 1)
-
-        let v = clamp((vTaper - 1.1) / 0.6)
-        let t = clamp((torsoBalance - 1.0) / 0.4)
-        let u = clamp((upperMass - 0.95) / 0.35)
-
-        let physique = (v * 0.5) + (t * 0.25) + (u * 0.25)
-
-        return 25 + physique * 60   // 🔥 25 → 85 real human band
-    }
-
-    private func clamp(_ v: Double) -> Double {
-        max(0, min(v, 1))
-    }
-
 
     // MARK: - STABILITY
 
@@ -135,14 +109,6 @@ final class ProgressCalculator {
         let diff = abs(la.x - ra.x)
         let score = 1 - min(diff * 1.8, 1)
 
-        return 40 + score * 50   // 40–90
+        return 40 + score * 50
     }
-
-    // MARK: - UTIL
-
-    private func distance(_ a: VNRecognizedPoint, _ b: VNRecognizedPoint) -> Double {
-        sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2))
-    }
-
-
 }
