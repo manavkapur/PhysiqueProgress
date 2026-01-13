@@ -18,10 +18,36 @@ final class SubscriptionManager {
     static let shared = SubscriptionManager()
 
     private let productIDs = [
-        "com.physiqueprogress.premium.monthly"
+        "com.apertix.physiqueprogress.premium.monthly"
     ]
 
     private(set) var products: [Product] = []
+    private var updateListenerTask: Task<Void, Never>? = nil
+
+
+    
+
+    
+    func startListeningForTransactions() {
+        updateListenerTask?.cancel()
+
+        updateListenerTask = Task { [weak self] in
+            guard let self else { return }
+
+            for await result in Transaction.updates {
+                do {
+                    let transaction = try self.verify(result)
+                    await transaction.finish()
+                    print("✅ Transaction update handled:", transaction.productID)
+                } catch {
+                    print("❌ Transaction failed verification")
+                }
+            }
+        }
+    }
+
+
+
 
     // Load products from App Store
     func loadProducts() async throws {
@@ -60,8 +86,13 @@ final class SubscriptionManager {
 
     // Restore purchases
     func restore() async {
-        for await _ in Transaction.currentEntitlements { }
+        do {
+            try await AppStore.sync()
+        } catch {
+            print("Restore failed:", error)
+        }
     }
+
 
     // Verification helper
     private func verify<T>(
@@ -74,4 +105,9 @@ final class SubscriptionManager {
             throw PurchaseError.failedVerification
         }
     }
+    
+    func refreshPremiumStatus() async -> Bool {
+        await hasPremiumAccess()
+    }
+
 }

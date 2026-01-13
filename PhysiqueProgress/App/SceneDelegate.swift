@@ -28,6 +28,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             window.rootViewController = createLogin()
         }
         
+        Task {
+            SubscriptionManager.shared.startListeningForTransactions()
+        }
+
+        
         self.window = window
         window.makeKeyAndVisible()
         

@@ -37,8 +37,11 @@ final class SubscriptionViewModel {
             do {
                 let success = try await manager.purchase(product)
                 if success {
-                    onPurchaseSuccess?()
+                    if await manager.hasPremiumAccess() {
+                        onPurchaseSuccess?()
+                    }
                 }
+
                 
             } catch {
                 onError?(error.localizedDescription)
@@ -49,7 +52,10 @@ final class SubscriptionViewModel {
     func restore() {
         Task {
             await manager.restore()
-            onPurchaseSuccess?()
+            if await manager.hasPremiumAccess() {
+                onPurchaseSuccess?()
+            }
+
         }
     }
     
