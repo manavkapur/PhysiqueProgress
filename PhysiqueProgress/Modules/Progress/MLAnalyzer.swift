@@ -20,20 +20,20 @@ final class MLAnalyzer {
 
     func analyze(
         image: UIImage,
-        completion: @escaping (PoseMetrics?) -> Void
+        completion: @escaping (MLAnalysisResult?) -> Void
     ) {
 
         let stableImage = normalizedImage(image)
-        var results: [PoseMetrics] = []
+        var results: [MLAnalysisResult] = []
 
         func runPass(_ index: Int) {
-            singleAnalyze(image: stableImage) { metrics in
-                guard let metrics else {
+            singleAnalyze(image: stableImage) { result in
+                guard let result else {
                     DispatchQueue.main.async { completion(nil) }
                     return
                 }
 
-                results.append(metrics)
+                results.append(result)
 
                 if index == 2 {
                     let averaged = self.average(results)
@@ -51,7 +51,7 @@ final class MLAnalyzer {
 
     private func singleAnalyze(
         image: UIImage,
-        completion: @escaping (PoseMetrics?) -> Void
+        completion: @escaping (MLAnalysisResult?) -> Void
     ) {
 
         guard let cgImage = image.cgImage else {
@@ -84,10 +84,10 @@ final class MLAnalyzer {
             ---------------------------------
             """)
 
-            // ✅ STEP 4 — physique score (obese killer)
+            // ✅ STEP 3 — physique score
             let physiqueScore = self.physiqueScorer.score(from: physiqueMetrics)
 
-            // ✅ STEP 5 — pose
+            // ✅ STEP 4 — pose
             self.detector.detectPose(in: image) { observation in
                 guard let observation else {
                     completion(nil)
@@ -99,30 +99,46 @@ final class MLAnalyzer {
                     physiqueScore: Double(physiqueScore)
                 )
 
-
-                // ✅ TEMP wiring (next step we rebuild overall)
-                let final = PoseMetrics(
+                // ✅ FINAL pose object
+                let finalPose = PoseMetrics(
                     postureScore: poseMetrics.postureScore,
                     symmetryScore: poseMetrics.symmetryScore,
-                    proportionScore: Double(physiqueScore),   // 🔥 physique replaces proportion
+                    physiqueScore: Double(physiqueScore),
                     stabilityScore: poseMetrics.stabilityScore,
                     overallScore: poseMetrics.overallScore
                 )
 
-                completion(final)
+                // ✅ FINAL ML result
+                let result = MLAnalysisResult(
+                    pose: finalPose,
+                    shape: physiqueMetrics
+                )
+
+                completion(result)
             }
         }
     }
 
-    // MARK: - Averaging
+    // MARK: - Averaging (pose only, keep last shape)
 
-    private func average(_ r: [PoseMetrics]) -> PoseMetrics {
-        PoseMetrics(
-            postureScore: r.map { $0.postureScore }.avg,
-            symmetryScore: r.map { $0.symmetryScore }.avg,
-            proportionScore: r.map { $0.proportionScore }.avg,
-            stabilityScore: r.map { $0.stabilityScore }.avg,
-            overallScore: r.map { $0.overallScore }.avg
+    private func average(_ results: [MLAnalysisResult]) -> MLAnalysisResult {
+
+        let poses = results.map { $0.pose }
+
+        let averagedPose = PoseMetrics(
+            postureScore: poses.map { $0.postureScore }.avg,
+            symmetryScore: poses.map { $0.symmetryScore }.avg,
+            physiqueScore: poses.map { $0.physiqueScore }.avg,
+            stabilityScore: poses.map { $0.stabilityScore }.avg,
+            overallScore: poses.map { $0.overallScore }.avg
+        )
+
+        // shape does not need averaging (same image)
+        let shape = results.last!.shape
+
+        return MLAnalysisResult(
+            pose: averagedPose,
+            shape: shape
         )
     }
 

@@ -25,9 +25,13 @@ final class ProgressRepository {
         return decoded
     }
     
-    private func persist(_ entries: [ProgressEntry]){
-        guard let data = try? JSONEncoder().encode(entries) else { return }
-        try? data.write(to: fileURL())
+    private func persist(_ entries: [ProgressEntry]) {
+        do {
+            let data = try JSONEncoder().encode(entries)
+            try data.write(to: fileURL(), options: .atomic)
+        } catch {
+            print("❌ Failed to persist progress:", error)
+        }
     }
     
     private func fileURL() -> URL {
@@ -35,6 +39,7 @@ final class ProgressRepository {
         
         return document.appendingPathComponent(fileName)
     }
-    
+
+
     
 }

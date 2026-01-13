@@ -2,27 +2,23 @@
 //  CameraViewController.swift
 //  PhysiqueProgress
 //
-//  Created by Manav Kapur on 03/01/26.
-//
 
 import UIKit
 
 final class CameraViewController: UIViewController {
     
-    
     private let viewModel = CameraViewModel()
-    
     private let captureButton = UIButton(type: .system)
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("🚀 CameraViewController appeared 1")
+        print("🚀 CameraViewController appeared")
         title = "Track Progress"
         view.backgroundColor = .systemBackground
         setupUI()
         bindViewModel()
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
@@ -31,8 +27,6 @@ final class CameraViewController: UIViewController {
         #endif
     }
 
-
-    
     private func setupUI() {
         captureButton.setTitle("Capture photo", for: .normal)
         captureButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
@@ -48,32 +42,18 @@ final class CameraViewController: UIViewController {
     }
     
     private func bindViewModel() {
-//        viewModel.onImageSaved = { [weak self] in
-//            print("Image saved callback")
-//            self?.showSuccess()
-//        }
-        
         viewModel.onError = { [weak self] message in
-            self?.showAlert( message)
-        }
-        viewModel.onMLResult = { [weak self] metrics in
-            print("ML RESULT CALLBACK RECEIVED")
-            self?.showML(metrics)
+            self?.showAlert(message)
         }
 
-        
+        viewModel.onMLResult = { [weak self] pose in
+            print("ML RESULT CALLBACK RECEIVED")
+            self?.showML(pose)
+        }
     }
     
     @objc private func captureTapped() {
         viewModel.openCamera(from: self)
-    }
-    
-    private func showSuccess(){
-        let alert = UIAlertController(
-            title: "Saved", message: "Your progress photo was saved locally", preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
     }
     
     private func showAlert(_ message: String) {
@@ -82,7 +62,6 @@ final class CameraViewController: UIViewController {
             message: message,
             preferredStyle: .alert
         )
-
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
@@ -91,7 +70,7 @@ final class CameraViewController: UIViewController {
         let message = """
         Posture: \(Int(m.postureScore))
         Symmetry: \(Int(m.symmetryScore))
-        Proportion: \(Int(m.proportionScore))
+        Physique: \(Int(m.physiqueScore))
         Stability: \(Int(m.stabilityScore))
 
         Overall Score: \(Int(m.overallScore))
@@ -107,48 +86,17 @@ final class CameraViewController: UIViewController {
     }
     
     func testMLWithImage(named name: String) {
-//    #if targetEnvironment(simulator)
-//        showML(mockMetrics())
-//        return
-//    #endif
-
         guard let image = UIImage(named: name) else {
             showAlert("Test image not found")
             return
         }
 
-        MLAnalyzer().analyze(image: image) { [weak self] metrics in
-            guard let metrics else {
+        MLAnalyzer().analyze(image: image) { [weak self] result in
+            guard let result else {
                 self?.showAlert("No ML metrics returned")
                 return
             }
-            self?.showML(metrics)
+            self?.showML(result.pose)
         }
     }
-    
-    private func showMLResult(_ score: Double) {
-        let alert = UIAlertController(
-            title: "ML Analysis Complete",
-            message: "Posture Score: \(Int(score))",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-    }
-
-
-
-//#if DEBUG
-//private func mockMetrics() -> PoseMetrics {
-//    PoseMetrics(
-//        postureScore: 82,
-//        symmetryScore: 74,
-//        proportionScore: 68,
-//        stabilityScore: 80,
-//        overallScore: 76
-//    )
-//}
-//#endif
-
-    
 }

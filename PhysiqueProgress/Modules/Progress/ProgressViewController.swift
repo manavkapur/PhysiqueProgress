@@ -1,92 +1,86 @@
-//
-//  ProgressViewController.swift
-//  PhysiqueProgress
-//
-//  Created by Manav Kapur on 04/01/26.
-//
-
 import UIKit
 
 final class ProgressViewController: UIViewController {
 
     private let viewModel = ProgressViewModel()
+
     private let tableView = UITableView()
-    
     private let chartView = LineChartView()
+    private let upgradeBanner = UILabel()
+
     private var isPremiumUser = false
 
+    private var tableTopToBanner: NSLayoutConstraint!
+    private var tableTopToChart: NSLayoutConstraint!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Progress Analytics"
         view.backgroundColor = .systemBackground
+
+        setupViews()
+        setupLayout()
         setupTable()
-        setupChart()
+
         checkPremium()
         loadData()
     }
 
-    private func loadData() {
-        viewModel.load()
-        tableView.reloadData()
-        
-        if isPremiumUser {
-            chartView.values = viewModel.overallScores().reversed()
-        }
+    private func setupViews() {
+
+        // Banner
+        upgradeBanner.text = "🔒 Upgrade to Premium to see progress charts"
+        upgradeBanner.textAlignment = .center
+        upgradeBanner.textColor = .systemRed
+        upgradeBanner.numberOfLines = 0
+        upgradeBanner.translatesAutoresizingMaskIntoConstraints = false
+
+        // Chart
+        chartView.translatesAutoresizingMaskIntoConstraints = false
+
+        // Table
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(upgradeBanner)
+        view.addSubview(chartView)
+        view.addSubview(tableView)
     }
 
-    private func setupTable() {
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.dataSource = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+    private func setupLayout() {
 
-        view.addSubview(tableView)
+        tableTopToBanner = tableView.topAnchor.constraint(equalTo: upgradeBanner.bottomAnchor, constant: 12)
+        tableTopToChart = tableView.topAnchor.constraint(equalTo: chartView.bottomAnchor, constant: 12)
 
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+
+            // Banner
+            upgradeBanner.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            upgradeBanner.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            upgradeBanner.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+
+            // Chart
+            chartView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            chartView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            chartView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            chartView.heightAnchor.constraint(equalToConstant: 200),
+
+            // Table (bottom always fixed)
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
-}
 
-extension ProgressViewController: UITableViewDataSource {
-    
-    func tableView(
-        _ tableView: UITableView,
-        numberOfRowsInSection section: Int
-    ) -> Int {
-        viewModel.count
+    private func setupTable() {
+        tableView.dataSource = self
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
     }
-    
-    func tableView(
-        _ tableView: UITableView,
-        cellForRowAt indexPath: IndexPath
-    ) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCell(
-            withIdentifier: "cell",
-            for: indexPath
-        )
-        
-        guard let entry = viewModel.entry(at: indexPath.row) else {
-            cell.textLabel?.text = "Invalid entry"
-            return cell
-        }
-        
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        
-        cell.textLabel?.numberOfLines = 0
-        cell.textLabel?.text = """
-        \(formatter.string(from: entry.date))
-        Overall Score: \(Int(entry.overallScore))
-        """
-        
-        return cell
+
+    private func loadData() {
+        viewModel.load()
+        tableView.reloadData()
     }
-    
+
     private func checkPremium() {
         Task {
             isPremiumUser = await SubscriptionManager.shared.hasPremiumAccess()
@@ -94,43 +88,55 @@ extension ProgressViewController: UITableViewDataSource {
         }
     }
 
-    private func setupChart() {
-        chartView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(chartView)
-
-        NSLayoutConstraint.activate([
-            chartView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            chartView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            chartView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            chartView.heightAnchor.constraint(equalToConstant: 200)
-        ])
-    }
-
     private func updateUIForAccess() {
-        if PremiumFeatureGate.canAccessPremiumFeatures(isPremium: isPremiumUser) {
+
+        tableTopToBanner.isActive = false
+        tableTopToChart.isActive = false
+
+        if isPremiumUser {
+            upgradeBanner.isHidden = true
             chartView.isHidden = false
+            tableTopToChart.isActive = true
+            chartView.values = viewModel.overallScores().reversed()
         } else {
+            upgradeBanner.isHidden = false
             chartView.isHidden = true
-            showUpgradeBanner()
+            tableTopToBanner.isActive = true
         }
+
+        view.layoutIfNeeded()
     }
-    
-    private func showUpgradeBanner() {
-        let banner = UILabel()
-        banner.text = "🔒 Upgrade to Premium to see progress charts"
-        banner.textAlignment = .center
-        banner.textColor = .systemRed
-        banner.numberOfLines = 0
-        banner.translatesAutoresizingMaskIntoConstraints = false
+}
 
-        view.addSubview(banner)
+extension ProgressViewController: UITableViewDataSource {
 
-        NSLayoutConstraint.activate([
-            banner.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            banner.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            banner.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
-        ])
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        viewModel.count
     }
 
+    func tableView(_ tableView: UITableView,
+                   cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+
+        guard let entry = viewModel.entry(at: indexPath.row) else {
+            cell.textLabel?.text = "Invalid entry"
+            return cell
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+
+        cell.textLabel?.numberOfLines = 0
+        cell.textLabel?.text = """
+        \(formatter.string(from: entry.date))
+
+        Overall: \(Int(entry.overallScore))
+        Physique: \(Int(entry.physiqueScore))
+        FatIndex: \(String(format: "%.2f", entry.fatIndex))
+        V-taper: \(String(format: "%.2f", entry.vTaper))
+        """
+
+        return cell
+    }
 }

@@ -3,7 +3,7 @@ import Vision
 struct PoseMetrics {
     let postureScore: Double
     let symmetryScore: Double
-    let proportionScore: Double   // now = physique score
+    let physiqueScore: Double   // now = physique score
     let stabilityScore: Double
     let overallScore: Double
 }
@@ -47,14 +47,14 @@ final class ProgressCalculator {
         return PoseMetrics(
             postureScore: posture,
             symmetryScore: symmetry,
-            proportionScore: physique,   // 🔥 physique lives here now
+            physiqueScore: physique,   // 🔥 physique lives here now
             stabilityScore: stability,
             overallScore: overall
         )
     }
 
     private func zeroMetrics() -> PoseMetrics {
-        PoseMetrics(postureScore: 0, symmetryScore: 0, proportionScore: 0, stabilityScore: 0, overallScore: 0)
+        PoseMetrics(postureScore: 0, symmetryScore: 0, physiqueScore: 0, stabilityScore: 0, overallScore: 0)
     }
 
     // MARK: - POSTURE

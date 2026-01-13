@@ -36,7 +36,7 @@ final class BodySegmentationManager {
                 }
 
                 // 🧪 debug once
-                #if DEBUG
+                #if DEBUG && false
                 DispatchQueue.main.async {
                     UIImageWriteToSavedPhotosAlbum(UIImage(cgImage: cgMask), nil, nil, nil)
                     print("✅ Mask saved")
