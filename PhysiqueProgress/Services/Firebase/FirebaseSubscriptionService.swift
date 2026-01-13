@@ -5,22 +5,37 @@
 //  Created by Manav Kapur on 05/01/26.
 
 
+//
+//  FirebaseSubscriptionService.swift
+//  PhysiqueProgress
+//
 
+import FirebaseFirestore
 import FirebaseAnalytics
 
-final class FirebaseAnalyticsService {
+final class FirebaseSubscriptionService {
 
-    static let shared = FirebaseAnalyticsService()
+    private let db = Firestore.firestore()
 
-    func logPremiumPurchase() {
-        Analytics.logEvent("premium_purchase", parameters: nil)
-    }
+    func updatePremiumStatus(userId: String, isPremium: Bool) {
 
-    func logPremiumAnalyticsViewed() {
-        Analytics.logEvent("premium_analytics_viewed", parameters: nil)
-    }
+        let data: [String: Any] = [
+            "isPremium": isPremium,
+            "updatedAt": Timestamp(date: Date())
+        ]
 
-    func logFreeAnalyticsViewed() {
-        Analytics.logEvent("free_analytics_viewed", parameters: nil)
+        db.collection("users")
+            .document(userId)
+            .setData(data, merge: true)
+
+        // 🔥 Analytics mirror
+        Analytics.setUserProperty(isPremium ? "true" : "false", forName: "is_premium")
+
+        if isPremium {
+            Analytics.logEvent("premium_active", parameters: nil)
+        } else {
+            Analytics.logEvent("premium_inactive", parameters: nil)
+        }
     }
 }
+

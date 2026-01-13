@@ -50,19 +50,42 @@ final class ProgressRepository {
         guard let uid = Auth.auth().currentUser?.uid else { return }
 
         let data: [String: Any] = [
-            "posture": entry.postureScore,
-            "symmetry": entry.symmetryScore,
-            "proportion": entry.proportionScore,
-            "stability": entry.stabilityScore,
-            "overall": entry.overallScore,
-            "date": Timestamp(date: entry.date)
+
+            // 🔹 SYSTEM
+            "id": entry.id,
+            "imageFileName": entry.imageFileName,
+            "date": Timestamp(date: entry.date),
+            "weekOfYear": entry.weekOfYear,
+            "engineVersion": entry.engineVersion,
+
+            // 🔹 USER METADATA
+            "height": entry.height,
+            "weight": entry.weight as Any,
+            "poseQuality": entry.poseQuality,
+
+            // 🔹 FINAL SCORES
+            "overallScore": entry.overallScore,
+            "physiqueScore": entry.physiqueScore,
+
+            // 🔹 POSE QUALITY
+            "postureScore": entry.postureScore,
+            "symmetryScore": entry.symmetryScore,
+            "stabilityScore": entry.stabilityScore,
+
+            // 🔹 TRUE BODY SHAPE
+            "vTaper": entry.vTaper,
+            "waistHip": entry.waistHip,
+            "fatIndex": entry.fatIndex,
+            "torsoRatio": entry.torsoRatio,
+            "shoulderThigh": entry.shoulderThigh
         ]
 
         Firestore.firestore()
             .collection("users")
             .document(uid)
             .collection("progress")
-            .addDocument(data: data)
+            .document(entry.id) // 👈 better than addDocument
+            .setData(data, merge: true)
     }
 
 }

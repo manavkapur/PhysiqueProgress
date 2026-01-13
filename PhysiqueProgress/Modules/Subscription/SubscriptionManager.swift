@@ -39,11 +39,25 @@ final class SubscriptionManager {
                 do {
                     let transaction = try self.verify(result)
                     await transaction.finish()
+
+                    if self.productIDs.contains(transaction.productID),
+                       transaction.revocationDate == nil {
+
+                        FirebaseAnalyticsService.shared.logSubscriptionActive()
+                        self.syncPremiumToFirebase(true)
+
+                    } else {
+                        FirebaseAnalyticsService.shared.logSubscriptionInactive()
+                        self.syncPremiumToFirebase(false)
+                    }
+
                     print("✅ Transaction update handled:", transaction.productID)
+
                 } catch {
                     print("❌ Transaction failed verification")
                 }
             }
+
         }
     }
 
@@ -64,6 +78,11 @@ final class SubscriptionManager {
             let transaction = try verify(verification)
             await transaction.finish()
             
+            FirebaseAnalyticsService.shared.logPremiumPurchase(
+                productId: transaction.productID
+            )
+
+            FirebaseAnalyticsService.shared.logSubscriptionActive()
             syncPremiumToFirebase(true)
             return true
 
@@ -77,22 +96,27 @@ final class SubscriptionManager {
 
     // 🔑 Source of truth
     func hasPremiumAccess() async -> Bool {
+        var isPremium = false
+
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result,
                productIDs.contains(transaction.productID),
                transaction.revocationDate == nil {
-                
-                syncPremiumToFirebase(true)
-                return true
+
+                isPremium = true
+                break
             }
         }
-        return false
+
+        syncPremiumToFirebase(isPremium)
+        return isPremium
     }
 
     // Restore purchases
     func restore() async {
         do {
             try await AppStore.sync()
+            FirebaseAnalyticsService.shared.logPremiumRestore()
         } catch {
             print("Restore failed:", error)
         }

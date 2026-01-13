@@ -5,13 +5,24 @@
 
 import UIKit
 
+import FirebaseAnalytics
+
+
 final class CameraViewController: UIViewController {
     
     private let viewModel = CameraViewModel()
     private let captureButton = UIButton(type: .system)
+    
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        Analytics.logEvent("test_event", parameters: [
+            "source": "camera",
+            "time": Date().timeIntervalSince1970
+        ])
+        
         print("🚀 CameraViewController appeared")
         title = "Track Progress"
         view.backgroundColor = .systemBackground

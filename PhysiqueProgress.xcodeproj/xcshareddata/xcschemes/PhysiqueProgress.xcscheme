@@ -50,6 +50,12 @@
             ReferencedContainer = "container:PhysiqueProgress.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-FIRAnalyticsDebugEnabled "
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <StoreKitConfigurationFileReference
          identifier = "../../PhysiqueProgress/Modules/Subscription/PhysiqueProgress.storekit">
       </StoreKitConfigurationFileReference>
