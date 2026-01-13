@@ -50,7 +50,7 @@ final class CameraViewModel {
             )
             DispatchQueue.main.async {
                 self?.progressRepo.save(entry)
-                self?.onMLResult?(metrics)  // ✅ only one alert now
+                self?.onMLResult?(metrics)
             }
             
             
