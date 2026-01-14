@@ -6,6 +6,8 @@ final class LoginViewController: UIViewController {
 
     private let signupButton = UIButton(type: .system)
 
+    private let forgotButton = UIButton(type: .system)
+
     private let emailField = UITextField()
     private let passwordField = UITextField()
     private let loginButton = UIButton(type: .system)
@@ -34,12 +36,16 @@ final class LoginViewController: UIViewController {
         signupButton.setTitle("Don't have an account? Sign up", for: .normal)
         signupButton.addTarget(self, action: #selector(signupTapped), for: .touchUpInside)
 
+        forgotButton.setTitle("Forgot password?", for: .normal)
+        forgotButton.addTarget(self, action: #selector(forgotTapped), for: .touchUpInside)
+
 
         let stack = UIStackView(arrangedSubviews: [
             emailField,
             passwordField,
-            loginButton,
+            forgotButton,
             signupButton,
+            loginButton,
             activityIndicator
         ])
         stack.axis = .vertical
@@ -123,6 +129,11 @@ final class LoginViewController: UIViewController {
         present(alert, animated: true)
     }
 
-
+    @objc private func forgotTapped() {
+        navigationController?.pushViewController(
+            ForgotPasswordViewController(),
+            animated: true
+        )
+    }
 
 }

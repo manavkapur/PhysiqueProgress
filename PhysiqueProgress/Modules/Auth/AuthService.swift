@@ -61,5 +61,21 @@ final class AuthService {
     func resendVerification(completion: @escaping (Error?) -> Void) {
         Auth.auth().currentUser?.sendEmailVerification(completion: completion)
     }
+    
+    // AuthService.swift
+
+    func sendPasswordReset(
+        email: String,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        Auth.auth().sendPasswordReset(withEmail: email) { error in
+            if let error {
+                completion(.failure(error))
+            } else {
+                completion(.success(()))
+            }
+        }
+    }
+
 
 }
