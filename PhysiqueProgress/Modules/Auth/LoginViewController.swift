@@ -7,68 +7,135 @@ final class LoginViewController: UIViewController {
     private let viewModel = LoginViewModel()
 
     private let signupButton = UIButton(type: .system)
-
     private let forgotButton = UIButton(type: .system)
-
-    
-    
-    private let emailField = UITextField()
-    private let passwordField = UITextField()
-    private let loginButton = UIButton(type: .system)
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
+    
+    
+    private let logoImageView = UIImageView()
+    private let titleLabel = UILabel()
+    private let cardView = CardView()
+
+    private let emailField = AppTextField(placeholder: "Email")
+    private let passwordField = AppTextField(placeholder: "Password")
+    private let loginButton = PrimaryButton(title: "Log In")
+
+    private let appleButton = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
+    
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Login"
-        view.backgroundColor = .systemBackground
+        title = nil
+        view.backgroundColor = AppColors.background
         setupUI()
         bindViewModel()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        cardView.alpha = 0
+        appleButton.alpha = 0
+        logoImageView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+
+        UIView.animate(withDuration: 0.6,
+                       delay: 0,
+                       usingSpringWithDamping: 0.85,
+                       initialSpringVelocity: 0.6,
+                       options: .curveEaseOut) {
+
+            self.cardView.alpha = 1
+            self.appleButton.alpha = 1
+            self.logoImageView.transform = .identity
+        }
+    }
+
 
     private func setupUI() {
-        emailField.placeholder = "Email"
-        emailField.borderStyle = .roundedRect
-        emailField.autocapitalizationType = .none
 
-        passwordField.placeholder = "Password"
-        passwordField.borderStyle = .roundedRect
-        passwordField.isSecureTextEntry = true
+        // MARK: - Logo
+        logoImageView.image = UIImage(named: "AppLogo") // or AppLogo
+        logoImageView.contentMode = .scaleAspectFit
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
 
-        loginButton.setTitle("Login", for: .normal)
-        loginButton.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
-        
-        signupButton.setTitle("Don't have an account? Sign up", for: .normal)
-        signupButton.addTarget(self, action: #selector(signupTapped), for: .touchUpInside)
+        // MARK: - Title
+        titleLabel.text = "PhysiqueProgress"
+        titleLabel.font = .systemFont(ofSize: 30, weight: .bold)
+        titleLabel.textColor = AppColors.textPrimary
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
+        // MARK: - Secondary buttons
         forgotButton.setTitle("Forgot password?", for: .normal)
+        forgotButton.setTitleColor(AppColors.textSecondary, for: .normal)
         forgotButton.addTarget(self, action: #selector(forgotTapped), for: .touchUpInside)
 
-        let appleButton = ASAuthorizationAppleIDButton()
-        appleButton.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
-        appleButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
+        signupButton.setTitle("Don’t have an account? Sign up", for: .normal)
+        signupButton.setTitleColor(AppColors.primary, for: .normal)
+        signupButton.addTarget(self, action: #selector(signupTapped), for: .touchUpInside)
 
-        
+        loginButton.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
+
+        appleButton.cornerRadius = 12
+        appleButton.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
+        appleButton.heightAnchor.constraint(equalToConstant: 52).isActive = true
+
+        activityIndicator.color = .white
+
+        // MARK: - Card stack
         let stack = UIStackView(arrangedSubviews: [
             emailField,
             passwordField,
-            forgotButton,
-            signupButton,
             loginButton,
-            appleButton,
-            activityIndicator
+            forgotButton,
+            signupButton
         ])
+
         stack.axis = .vertical
         stack.spacing = 16
         stack.translatesAutoresizingMaskIntoConstraints = false
 
-        view.addSubview(stack)
+        cardView.addSubview(stack)
+
+        // MARK: - Add subviews
+        view.addSubview(logoImageView)
+        view.addSubview(titleLabel)
+        view.addSubview(cardView)
+        view.addSubview(appleButton)
+
+        // MARK: - Adaptive logo size
+        let logoSize = UIScreen.main.bounds.height * 0.11
 
         NSLayoutConstraint.activate([
-            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stack.widthAnchor.constraint(equalToConstant: 280)
+
+            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
+            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoImageView.heightAnchor.constraint(equalToConstant: logoSize),
+            logoImageView.widthAnchor.constraint(equalTo: logoImageView.heightAnchor),
+
+            titleLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 12),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            cardView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 28),
+            cardView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            cardView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+
+            stack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 24),
+            stack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 20),
+            stack.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -20),
+            stack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -24),
+
+            appleButton.topAnchor.constraint(equalTo: cardView.bottomAnchor, constant: 24),
+            appleButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            appleButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24)
         ])
+        
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        cardView.translatesAutoresizingMaskIntoConstraints = false
+        appleButton.translatesAutoresizingMaskIntoConstraints = false
+
     }
+
 
     private func bindViewModel() {
         viewModel.onLoginSuccess = { [weak self] in
@@ -98,8 +165,12 @@ final class LoginViewController: UIViewController {
         }
 
         viewModel.onLoading = { [weak self] loading in
-            loading ? self?.activityIndicator.startAnimating()
-                    : self?.activityIndicator.stopAnimating()
+            DispatchQueue.main.async {
+                self?.loginButton.isEnabled = !loading
+                loading ? self?.activityIndicator.startAnimating()
+                        : self?.activityIndicator.stopAnimating()
+            }
+            self?.cardView.alpha = loading ? 0.7 : 1
         }
     }
 
