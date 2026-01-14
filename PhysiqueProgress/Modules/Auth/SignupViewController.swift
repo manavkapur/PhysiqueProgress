@@ -2,9 +2,6 @@
 //  SignupViewController.swift
 //  PhysiqueProgress
 //
-//  Created by Manav Kapur on 01/01/26.
-//
-
 
 import UIKit
 
@@ -30,6 +27,7 @@ final class SignupViewController: UIViewController {
         emailField.placeholder = "Email"
         emailField.borderStyle = .roundedRect
         emailField.autocapitalizationType = .none
+        emailField.keyboardType = .emailAddress
 
         passwordField.placeholder = "Password"
         passwordField.borderStyle = .roundedRect
@@ -64,8 +62,12 @@ final class SignupViewController: UIViewController {
     }
 
     private func bindViewModel() {
+
         viewModel.onSignupSuccess = { [weak self] in
-            self?.switchToHome()
+            self?.navigationController?.setViewControllers(
+                [VerifyEmailViewController()],
+                animated: true
+            )
         }
 
         viewModel.onError = { [weak self] message in
@@ -86,21 +88,12 @@ final class SignupViewController: UIViewController {
         )
     }
 
-    private func switchToHome() {
-        guard let sceneDelegate =
-                view.window?.windowScene?.delegate as? SceneDelegate
-        else { return }
-
-        sceneDelegate.switchToHome()
-    }
-
     private func showAlert(_ message: String) {
         let alert = UIAlertController(
             title: "Signup failed",
             message: message,
             preferredStyle: .alert
         )
-
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }

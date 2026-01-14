@@ -2,11 +2,8 @@
 //  SignupViewModel.swift
 //  PhysiqueProgress
 //
-//  Created by Manav Kapur on 01/01/26.
-//
 
 import Foundation
-import Combine
 
 final class SignupViewModel {
 
@@ -41,7 +38,7 @@ final class SignupViewModel {
 
                 switch result {
                 case .success:
-                    self?.onSignupSuccess?()
+                    self?.onSignupSuccess?()   // 👉 go to verify screen
                 case .failure(let error):
                     self?.onError?(error.localizedDescription)
                 }

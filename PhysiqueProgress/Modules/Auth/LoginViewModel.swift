@@ -4,6 +4,8 @@
 //
 //  Created by Manav Kapur on 03/01/26.
 //
+import Foundation
+import FirebaseAuth
 
 final class LoginViewModel {
 
@@ -26,7 +28,12 @@ final class LoginViewModel {
 
             switch result {
             case .success:
-                self?.onLoginSuccess?()
+                if Auth.auth().currentUser?.isEmailVerified == true {
+                    self?.onLoginSuccess?()
+                } else {
+                    self?.onError?("Please verify your email before logging in.")
+                    try? Auth.auth().signOut()
+                }
             case .failure(let error):
                 self?.onError?(error.localizedDescription)
             }
