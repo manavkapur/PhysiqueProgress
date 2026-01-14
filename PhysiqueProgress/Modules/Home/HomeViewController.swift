@@ -162,13 +162,25 @@ class HomeViewController: UIViewController {
         reason: String,
         onSuccess: @escaping () -> Void
     ) {
-        BiometricAuthManager.authenticate(reason: reason) { success in
+        BiometricAuthManager.authenticate(reason: reason) { [weak self] success in
             DispatchQueue.main.async {
+                guard let self = self else { return }
+
                 if success {
                     onSuccess()
+                } else {
+                    let alert = UIAlertController(
+                        title: "Authentication Failed",
+                        message: "Biometric verification required to access this feature.",
+                        preferredStyle: .alert
+                    )
+
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
                 }
             }
         }
+
     }
 
 

@@ -17,7 +17,7 @@ final class BiometricAuthManager {
         var error: NSError?
 
         guard context.canEvaluatePolicy(
-            .deviceOwnerAuthenticationWithBiometrics,
+            .deviceOwnerAuthentication,
             error: &error
         ) else {
             completion(false)
@@ -25,7 +25,7 @@ final class BiometricAuthManager {
         }
 
         context.evaluatePolicy(
-            .deviceOwnerAuthenticationWithBiometrics,
+            .deviceOwnerAuthentication,
             localizedReason: reason
         ) { success, _ in
             DispatchQueue.main.async {

@@ -37,19 +37,17 @@ final class SecureScreenGuard {
         let window = UIWindow(windowScene: scene)
         window.frame = UIScreen.main.bounds
         window.windowLevel = .alert + 1
-        window.backgroundColor = .black
 
-        let label = UILabel(frame: window.bounds)
-        label.text = "🔒 Protected"
-        label.textColor = .white
-        label.textAlignment = .center
-        label.font = .boldSystemFont(ofSize: 22)
+        let blur = UIBlurEffect(style: .systemUltraThinMaterialDark)
+        let blurView = UIVisualEffectView(effect: blur)
+        blurView.frame = window.bounds
 
-        window.addSubview(label)
+        window.addSubview(blurView)
         window.makeKeyAndVisible()
 
         overlayWindow = window
     }
+
 
     @objc private static func appDidBecomeActive() {
         overlayWindow?.isHidden = true
