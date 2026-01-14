@@ -27,6 +27,10 @@ final class LoginViewController: UIViewController {
         super.viewDidLoad()
         title = nil
         view.backgroundColor = AppColors.background
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+
         setupUI()
         bindViewModel()
         loadLastEmail()
@@ -234,6 +238,10 @@ final class LoginViewController: UIViewController {
         if let savedEmail = UserDefaults.standard.string(forKey: "lastLoginEmail") {
             emailField.text = savedEmail
         }
+    }
+
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
     }
 
 }
