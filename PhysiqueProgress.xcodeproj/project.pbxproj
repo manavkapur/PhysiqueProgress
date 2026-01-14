@@ -48,6 +48,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Modules/Auth/Untitled.swift,
 			);
 			target = 33076D382F059069003AA3C1 /* PhysiqueProgress */;
 		};

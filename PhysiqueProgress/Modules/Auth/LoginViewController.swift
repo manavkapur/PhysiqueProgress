@@ -4,6 +4,8 @@ final class LoginViewController: UIViewController {
 
     private let viewModel = LoginViewModel()
 
+    private let signupButton = UIButton(type: .system)
+
     private let emailField = UITextField()
     private let passwordField = UITextField()
     private let loginButton = UIButton(type: .system)
@@ -28,11 +30,16 @@ final class LoginViewController: UIViewController {
 
         loginButton.setTitle("Login", for: .normal)
         loginButton.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
+        
+        signupButton.setTitle("Don't have an account? Sign up", for: .normal)
+        signupButton.addTarget(self, action: #selector(signupTapped), for: .touchUpInside)
+
 
         let stack = UIStackView(arrangedSubviews: [
             emailField,
             passwordField,
             loginButton,
+            signupButton,
             activityIndicator
         ])
         stack.axis = .vertical
@@ -88,6 +95,14 @@ final class LoginViewController: UIViewController {
             password: passwordField.text ?? ""
         )
     }
+    
+    @objc private func signupTapped() {
+        navigationController?.pushViewController(
+            SignupViewController(),
+            animated: true
+        )
+    }
+
     
     private func switchToHome() {
         guard let sceneDelegate =
