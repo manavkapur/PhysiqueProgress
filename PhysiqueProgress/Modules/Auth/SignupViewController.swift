@@ -82,7 +82,7 @@ final class SignupViewController: UIViewController {
         stack.spacing = 16
         stack.translatesAutoresizingMaskIntoConstraints = false
 
-        cardView.addSubview(stack)
+        cardView.embed(stack)
 
         view.addSubview(logoImageView)
         view.addSubview(titleLabel)
