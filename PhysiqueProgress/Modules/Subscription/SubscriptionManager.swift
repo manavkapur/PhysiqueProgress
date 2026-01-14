@@ -97,7 +97,7 @@ final class SubscriptionManager {
     // 🔑 Source of truth
     func hasPremiumAccess() async -> Bool {
         var isPremium = false
-
+        print("🔥 hasPremiumAccess FIRED")
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result,
                productIDs.contains(transaction.productID),
