@@ -1,56 +1,51 @@
-//
-//  DeepLinkManager.swift
-//  PhysiqueProgress
-//
-//  Created by Manav Kapur on 05/01/26.
-//
-
 import UIKit
 
 final class DeepLinkManager {
 
     static let shared = DeepLinkManager()
-
     private init() {}
 
     func handle(url: URL, window: UIWindow?) {
-        let deepLink =
-            DeepLink(url: url) ??
-            DeepLink(schemeURL: url)
 
-        guard let deepLink else { return }
+        let deepLink: DeepLink
+        if let schemeLink = DeepLink(schemeURL: url) {
+            deepLink = schemeLink
+        } else {
+            deepLink = DeepLink(url: url)
+        }
+
+        if !AppEnvironment.isUserLoggedIn {
+            AppEnvironment.pendingDeepLink = deepLink.route
+            return
+        }
 
         route(deepLink.route, window: window)
     }
 
-    private func route(
-        _ route: DeepLinkRoute,
-        window: UIWindow?
-    ) {
+    func handleAfterLogin(route: DeepLinkRoute, window: UIWindow?) {
+        self.route(route, window: window)
+    }
+
+
+
+    // MARK: - Core router
+
+    private func route(_ route: DeepLinkRoute, window: UIWindow?) {
+
         guard
-            let nav = window?.rootViewController
-                as? UINavigationController
+            let nav = window?.rootViewController as? UINavigationController
         else { return }
 
         switch route {
 
         case .progress:
-            nav.pushViewController(
-                ProgressViewController(),
-                animated: true
-            )
+            nav.pushViewController(ProgressViewController(), animated: true)
 
         case .premium:
-            nav.pushViewController(
-                SubscriptionViewController(),
-                animated: true
-            )
+            nav.pushViewController(SubscriptionViewController(), animated: true)
 
         case .history:
-            nav.pushViewController(
-                HistoryViewController(),
-                animated: true
-            )
+            nav.pushViewController(HistoryViewController(), animated: true)
 
         case .unknown:
             break

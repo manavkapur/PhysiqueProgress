@@ -54,8 +54,22 @@ final class LoginViewController: UIViewController {
                 print("🔔 Authorization status:", settings.authorizationStatus.rawValue)
             }
 
+            
             NotificationCoordinator.shared.setupAfterLogin()
             self?.switchToHome()
+            
+            if let scene = self?.view.window?.windowScene,
+               let sceneDelegate = scene.delegate as? SceneDelegate,
+               let route = AppEnvironment.pendingDeepLink {
+
+                DeepLinkManager.shared.handleAfterLogin(
+                    route: route,
+                    window: sceneDelegate.window
+                )
+
+                AppEnvironment.pendingDeepLink = nil
+            }
+
         }
 
         viewModel.onError = { [weak self] message in
@@ -93,6 +107,7 @@ final class LoginViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
+
 
 
 }
