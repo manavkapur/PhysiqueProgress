@@ -78,14 +78,18 @@ After verifying, tap Refresh.
                     return
                 }
 
+                // 🔥 This line will trigger SessionManager automatically
+                _ = Auth.auth().currentUser?.isEmailVerified
+
                 if Auth.auth().currentUser?.isEmailVerified == true {
-                    self?.switchToHome()
+                    // Do nothing. SessionManager will redirect to Home.
                 } else {
                     self?.showAlert("Still not verified. Please check your email.")
                 }
             }
         }
     }
+
 
     @objc private func resendTapped() {
         authService.resendVerification { [weak self] error in

@@ -24,15 +24,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         
-        if let user = Auth.auth().currentUser {
-            if user.isEmailVerified {
-                window.rootViewController = createHome()
-            } else {
-                window.rootViewController = createVerifyEmail()
-            }
-        } else {
-            window.rootViewController = createLogin()
-        }
+        SessionManager.shared.start(window: window)
+        
         Task {
             SubscriptionManager.shared.startListeningForTransactions()
         }

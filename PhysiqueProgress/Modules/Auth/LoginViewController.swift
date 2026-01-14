@@ -1,4 +1,6 @@
 import UIKit
+import AuthenticationServices
+
 
 final class LoginViewController: UIViewController {
 
@@ -8,6 +10,8 @@ final class LoginViewController: UIViewController {
 
     private let forgotButton = UIButton(type: .system)
 
+    
+    
     private let emailField = UITextField()
     private let passwordField = UITextField()
     private let loginButton = UIButton(type: .system)
@@ -39,13 +43,18 @@ final class LoginViewController: UIViewController {
         forgotButton.setTitle("Forgot password?", for: .normal)
         forgotButton.addTarget(self, action: #selector(forgotTapped), for: .touchUpInside)
 
+        let appleButton = ASAuthorizationAppleIDButton()
+        appleButton.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
+        appleButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
 
+        
         let stack = UIStackView(arrangedSubviews: [
             emailField,
             passwordField,
             forgotButton,
             signupButton,
             loginButton,
+            appleButton,
             activityIndicator
         ])
         stack.axis = .vertical
@@ -63,14 +72,14 @@ final class LoginViewController: UIViewController {
 
     private func bindViewModel() {
         viewModel.onLoginSuccess = { [weak self] in
+
             UNUserNotificationCenter.current().getNotificationSettings { settings in
                 print("🔔 Authorization status:", settings.authorizationStatus.rawValue)
             }
 
-            
             NotificationCoordinator.shared.setupAfterLogin()
-            self?.switchToHome()
-            
+
+            // ✅ ONLY deep link continuation (optional)
             if let scene = self?.view.window?.windowScene,
                let sceneDelegate = scene.delegate as? SceneDelegate,
                let route = AppEnvironment.pendingDeepLink {
@@ -82,7 +91,6 @@ final class LoginViewController: UIViewController {
 
                 AppEnvironment.pendingDeepLink = nil
             }
-
         }
 
         viewModel.onError = { [weak self] message in
@@ -94,6 +102,7 @@ final class LoginViewController: UIViewController {
                     : self?.activityIndicator.stopAnimating()
         }
     }
+
 
     @objc private func loginTapped() {
         viewModel.login(
@@ -110,13 +119,7 @@ final class LoginViewController: UIViewController {
     }
 
     
-    private func switchToHome() {
-        guard let sceneDelegate =
-            view.window?.windowScene?.delegate as? SceneDelegate
-        else { return }
 
-        sceneDelegate.switchToHome()
-    }
     
     private func showAlert(_ message: String) {
         let alert = UIAlertController(
@@ -134,6 +137,9 @@ final class LoginViewController: UIViewController {
             ForgotPasswordViewController(),
             animated: true
         )
+    }
+    @objc private func appleLoginTapped() {
+        AppleAuthManager.shared.startSignInWithAppleFlow()
     }
 
 }
