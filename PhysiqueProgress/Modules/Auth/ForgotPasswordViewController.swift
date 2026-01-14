@@ -1,8 +1,8 @@
 import UIKit
 
-final class SignupViewController: UIViewController {
+final class ForgotPasswordViewController: UIViewController {
 
-    private let viewModel = SignupViewModel()
+    private let viewModel = ForgotPasswordViewModel()
 
     // MARK: - UI (Design System)
 
@@ -12,11 +12,8 @@ final class SignupViewController: UIViewController {
     private let cardView = CardView()
 
     private let emailField = AppTextField(placeholder: "Email")
-    private let passwordField = AppTextField(placeholder: "Password")
-    private let confirmField = AppTextField(placeholder: "Confirm Password")
-    private let signupButton = PrimaryButton(title: "Create Account")
-
-    private let activityIndicator = UIActivityIndicatorView(style: .medium)
+    private let sendButton = PrimaryButton(title: "Send reset link")
+    private let activity = UIActivityIndicatorView(style: .medium)
 
     // MARK: - Lifecycle
 
@@ -37,65 +34,55 @@ final class SignupViewController: UIViewController {
         logoImageView.contentMode = .scaleAspectFit
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
 
-        titleLabel.text = "Create Account"
-        titleLabel.font = .systemFont(ofSize: 30, weight: .bold)
+        titleLabel.text = "Reset password"
+        titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
         titleLabel.textColor = AppColors.textPrimary
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        subtitleLabel.text = "Start tracking your physique journey"
+        subtitleLabel.text = "Enter your email and we’ll send you a reset link."
         subtitleLabel.font = .systemFont(ofSize: 15, weight: .medium)
         subtitleLabel.textColor = AppColors.textSecondary
+        subtitleLabel.numberOfLines = 0
+        subtitleLabel.textAlignment = .center
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        cardView.translatesAutoresizingMaskIntoConstraints = false
-
-        // MARK: - Field configuration (important)
-
+        // Field config
         emailField.keyboardType = .emailAddress
         emailField.autocapitalizationType = .none
         emailField.textContentType = .username
-        emailField.returnKeyType = .next
+        emailField.returnKeyType = .done
 
-        passwordField.isSecureTextEntry = true
-        passwordField.textContentType = .newPassword
-        passwordField.returnKeyType = .next
+        sendButton.addTarget(self, action: #selector(sendTapped), for: .touchUpInside)
 
-        confirmField.isSecureTextEntry = true
-        confirmField.textContentType = .newPassword
-        confirmField.returnKeyType = .done
+        activity.color = .white
+        activity.hidesWhenStopped = true
 
-        signupButton.addTarget(self, action: #selector(signupTapped), for: .touchUpInside)
-
-        activityIndicator.color = .white
-
-        // MARK: - Stack
-
+        // Stack
         let stack = UIStackView(arrangedSubviews: [
+            subtitleLabel,
             emailField,
-            passwordField,
-            confirmField,
-            signupButton,
-            activityIndicator
+            sendButton,
+            activity
         ])
 
         stack.axis = .vertical
-        stack.spacing = 16
+        stack.spacing = 18
         stack.translatesAutoresizingMaskIntoConstraints = false
 
+        cardView.translatesAutoresizingMaskIntoConstraints = false
         cardView.addSubview(stack)
 
+        // Add to screen
         view.addSubview(logoImageView)
         view.addSubview(titleLabel)
-        view.addSubview(subtitleLabel)
         view.addSubview(cardView)
 
-        // MARK: - Layout
-
+        // Layout
         let logoSize = UIScreen.main.bounds.height * 0.1
 
         NSLayoutConstraint.activate([
 
-            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 22),
             logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoImageView.heightAnchor.constraint(equalToConstant: logoSize),
             logoImageView.widthAnchor.constraint(equalTo: logoImageView.heightAnchor),
@@ -103,10 +90,7 @@ final class SignupViewController: UIViewController {
             titleLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 12),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            subtitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-
-            cardView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 26),
+            cardView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 28),
             cardView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             cardView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
 
@@ -126,34 +110,36 @@ final class SignupViewController: UIViewController {
         view.addGestureRecognizer(tap)
 
         emailField.delegate = self
-        passwordField.delegate = self
-        confirmField.delegate = self
     }
 
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
 
-    // MARK: - ViewModel binding
+    // MARK: - ViewModel
 
     private func bindViewModel() {
 
-        viewModel.onSignupSuccess = { [weak self] in
-            self?.navigationController?.setViewControllers(
-                [VerifyEmailViewController()],
-                animated: true
-            )
+        viewModel.onSuccess = { [weak self] in
+            DispatchQueue.main.async {
+                self?.showAlert(
+                    "Reset email sent. Please check your inbox.",
+                    popOnOK: true
+                )
+            }
         }
 
         viewModel.onError = { [weak self] message in
-            self?.showAlert(message)
+            DispatchQueue.main.async {
+                self?.showAlert(message)
+            }
         }
 
         viewModel.onLoading = { [weak self] loading in
             DispatchQueue.main.async {
-                self?.signupButton.isEnabled = !loading
-                loading ? self?.activityIndicator.startAnimating()
-                        : self?.activityIndicator.stopAnimating()
+                self?.sendButton.isEnabled = !loading
+                loading ? self?.activity.startAnimating()
+                        : self?.activity.stopAnimating()
                 self?.cardView.alpha = loading ? 0.7 : 1
             }
         }
@@ -161,40 +147,27 @@ final class SignupViewController: UIViewController {
 
     // MARK: - Actions
 
-    @objc private func signupTapped() {
+    @objc private func sendTapped() {
         dismissKeyboard()
-        viewModel.signup(
-            email: emailField.text ?? "",
-            password: passwordField.text ?? "",
-            confirmPassword: confirmField.text ?? ""
-        )
+        viewModel.sendReset(email: emailField.text ?? "")
     }
 
-    private func showAlert(_ message: String) {
-        let alert = UIAlertController(
-            title: "Signup failed",
-            message: message,
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+    private func showAlert(_ message: String, popOnOK: Bool = false) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            if popOnOK {
+                self.navigationController?.popViewController(animated: true)
+            }
+        })
         present(alert, animated: true)
     }
 }
 
 // MARK: - UITextFieldDelegate
 
-extension SignupViewController: UITextFieldDelegate {
-
+extension ForgotPasswordViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-
-        if textField == emailField {
-            passwordField.becomeFirstResponder()
-        } else if textField == passwordField {
-            confirmField.becomeFirstResponder()
-        } else {
-            dismissKeyboard()
-        }
-
+        dismissKeyboard()
         return true
     }
 }

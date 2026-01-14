@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -23,11 +24,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         
-        if AppEnvironment.isUserLoggedIn {
-            window.rootViewController = createHome()
-        } else {
-            window.rootViewController = createLogin()
-        }
+        SessionManager.shared.start(window: window)
         
         Task {
             SubscriptionManager.shared.startListeningForTransactions()
@@ -37,6 +34,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         window.makeKeyAndVisible()
         
+    }
+
+    private func createVerifyEmail() -> UIViewController {
+        let nav = UINavigationController(rootViewController: VerifyEmailViewController())
+        return nav
     }
 
     private func createLogin() -> UIViewController {
