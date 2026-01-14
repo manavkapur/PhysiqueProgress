@@ -11,10 +11,15 @@ final class NotificationCoordinator {
     private init() {}
 
     func setupAfterLogin() {
+        print("🔥 setupAfterLogin called")
+
         NotificationPermissionManager.requestPermission { granted in
+            print("🔥 permission callback:", granted)
+
             guard granted else { return }
             NotificationScheduler.scheduleNotificationReminder()
         }
     }
+
 }
 

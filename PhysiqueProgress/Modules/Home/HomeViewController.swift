@@ -140,6 +140,8 @@ class HomeViewController: UIViewController {
     }
     
     private func logout() {
+        PushManager.shared.clearTokenOnLogout()
+
         try? Auth.auth().signOut()
         
         guard let sceneDelegate =

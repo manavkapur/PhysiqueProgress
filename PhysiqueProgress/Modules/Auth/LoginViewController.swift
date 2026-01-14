@@ -50,6 +50,10 @@ final class LoginViewController: UIViewController {
 
     private func bindViewModel() {
         viewModel.onLoginSuccess = { [weak self] in
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                print("🔔 Authorization status:", settings.authorizationStatus.rawValue)
+            }
+
             NotificationCoordinator.shared.setupAfterLogin()
             self?.switchToHome()
         }

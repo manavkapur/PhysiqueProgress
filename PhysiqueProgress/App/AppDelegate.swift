@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseAnalytics
+import FirebaseMessaging
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,6 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         FirebaseService.configure()
         
+        UNUserNotificationCenter.current().delegate = self
+        
         Analytics.logEvent("app_open_test", parameters: [
             "source": "xcode",
             "time": Date().timeIntervalSince1970
@@ -25,6 +28,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    // ✅ APNs token to Firebase
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        print("📲 APNs token received")
+        Messaging.messaging().apnsToken = deviceToken
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        print("❌ Failed to register:", error)
+    }
+
+    func application(
+        _ application: UIApplication,
+        didReceiveRemoteNotification userInfo: [AnyHashable : Any],
+        fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+    ) {
+        Messaging.messaging().appDidReceiveMessage(userInfo)
+        completionHandler(.newData)
+    }
+
 
     // MARK: UISceneSession Lifecycle
 
