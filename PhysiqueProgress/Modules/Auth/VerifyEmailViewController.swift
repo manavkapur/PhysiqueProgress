@@ -69,10 +69,16 @@ After verifying, tap Refresh.
     @objc private func refreshTapped() {
         activity.startAnimating()
 
-        authService.reloadUser { [weak self] verified in
+        Auth.auth().currentUser?.reload { [weak self] error in
             DispatchQueue.main.async {
                 self?.activity.stopAnimating()
-                if verified {
+
+                if let error {
+                    self?.showAlert(error.localizedDescription)
+                    return
+                }
+
+                if Auth.auth().currentUser?.isEmailVerified == true {
                     self?.switchToHome()
                 } else {
                     self?.showAlert("Still not verified. Please check your email.")
@@ -111,4 +117,13 @@ After verifying, tap Refresh.
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        if let user = Auth.auth().currentUser, user.isEmailVerified {
+            switchToHome()
+        }
+    }
+
 }

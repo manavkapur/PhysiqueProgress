@@ -25,19 +25,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         if let user = Auth.auth().currentUser {
-
             if user.isEmailVerified {
                 window.rootViewController = createHome()
             } else {
-                window.rootViewController = UINavigationController(
-                    rootViewController: VerifyEmailViewController()
-                )
+                window.rootViewController = createVerifyEmail()
             }
-
         } else {
             window.rootViewController = createLogin()
         }
-
         Task {
             SubscriptionManager.shared.startListeningForTransactions()
         }
@@ -46,6 +41,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         window.makeKeyAndVisible()
         
+    }
+
+    private func createVerifyEmail() -> UIViewController {
+        let nav = UINavigationController(rootViewController: VerifyEmailViewController())
+        return nav
     }
 
     private func createLogin() -> UIViewController {
