@@ -444,6 +444,7 @@
 		33076EE52F0B86CE003AA3C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PhysiqueProgressNotificationService/PhysiqueProgressNotificationService.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LZRFT54CXM;
@@ -469,6 +470,7 @@
 		33076EE62F0B86CE003AA3C1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PhysiqueProgressNotificationService/PhysiqueProgressNotificationService.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LZRFT54CXM;

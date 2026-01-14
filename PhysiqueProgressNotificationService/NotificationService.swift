@@ -17,6 +17,7 @@ final class NotificationService: UNNotificationServiceExtension {
         withContentHandler contentHandler:
         @escaping (UNNotificationContent) -> Void
     ) {
+        print("🔥 Notification Service Extension fired")
         self.contentHandler = contentHandler
         bestAttemptContent =
             (request.content.mutableCopy() as? UNMutableNotificationContent)
@@ -24,7 +25,8 @@ final class NotificationService: UNNotificationServiceExtension {
         guard
             let bestAttemptContent,
             let imageUrlString =
-                request.content.userInfo["image-url"] as? String,
+                request.content.userInfo["image-url"] as? String ??
+                request.content.userInfo["image"] as? String,
             let imageURL = URL(string: imageUrlString)
         else {
             contentHandler(request.content)
