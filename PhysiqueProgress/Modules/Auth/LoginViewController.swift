@@ -111,7 +111,7 @@ final class LoginViewController: UIViewController {
         stack.spacing = 16
         stack.translatesAutoresizingMaskIntoConstraints = false
 
-        cardView.addSubview(stack)
+        cardView.embed(stack)
 
         // MARK: - Add subviews
         view.addSubview(logoImageView)

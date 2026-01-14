@@ -13,6 +13,11 @@ class HomeViewController: UIViewController {
     
     private let viewModel = HomeViewModel()
     
+    private let titleLabel = UILabel()
+    private let logoView = UIImageView()
+
+    private let card = CardView()
+    private let stack = UIStackView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,54 +28,74 @@ class HomeViewController: UIViewController {
     }
     
     private func setupUI() {
-        let cameraBtb = makeButton(
-            title: "Track Progress",
-            action: #selector(cameraTapped)
-        )
-        
-        let historyBtb = makeButton(
-            title: "History",
-            action: #selector(historyTapped)
-        )
-        
-        let premiumBtn = makeButton(
-            title: "Go Premium",
-            action: #selector(subscriptionTapped)
-        )
-        
-        let analyticsBtn = makeButton(
-            title: "Progress Analytics",
-            action: #selector(AnalyticsTapped)
-        )
-        
-        let logoutBtn = makeButton(
-            title: "Logout",
-            action: #selector(logoutTapped)
-        )
 
-        
-        
+        let logo = UIImageView(image: UIImage(named: "AppLogo"))
+        logo.contentMode = .scaleAspectFit
+        logo.heightAnchor.constraint(equalToConstant: 90).isActive = true
+
+        let titleLabel = UILabel()
+        titleLabel.text = "PhysiqueProgress"
+        titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
+        titleLabel.textColor = .white
+        titleLabel.textAlignment = .center
+
+        let track = ActionCardView(
+            icon: UIImage(systemName: "camera.fill"),
+            title: "Track Progress",
+            subtitle: "Take photos and measurements"
+        )
+        track.addTarget(self, action: #selector(cameraTapped), for: .touchUpInside)
+
+        let history = ActionCardView(
+            icon: UIImage(systemName: "calendar"),
+            title: "View History",
+            subtitle: "See past progress entries"
+        )
+        history.addTarget(self, action: #selector(historyTapped), for: .touchUpInside)
+
+        let analytics = ActionCardView(
+            icon: UIImage(systemName: "chart.line.uptrend.xyaxis"),
+            title: "Progress Analytics",
+            subtitle: "Analyze your trends and stats"
+        )
+        analytics.addTarget(self, action: #selector(AnalyticsTapped), for: .touchUpInside)
+
+        let premium = ActionCardView(
+            icon: UIImage(systemName: "crown.fill"),
+            title: "Go Premium",
+            subtitle: "Unlock exclusive features",
+            highlight: true
+        )
+        premium.addTarget(self, action: #selector(subscriptionTapped), for: .touchUpInside)
+
+        let logout = ActionCardView(
+            icon: UIImage(systemName: "power"),
+            title: "Logout",
+            subtitle: "Sign out of your account"
+        )
+        logout.backgroundColor = UIColor.systemRed.withAlphaComponent(0.15)
+
+        logout.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
+
         let stack = UIStackView(arrangedSubviews: [
-            cameraBtb,
-            historyBtb,
-            analyticsBtn,
-            premiumBtn,
-            logoutBtn
+            logo, titleLabel,
+            track, history, analytics, premium, logout
         ])
-        
+
         stack.axis = .vertical
-        stack.spacing = 20
+        stack.spacing = 18
         stack.translatesAutoresizingMaskIntoConstraints = false
-        
+
         view.addSubview(stack)
-        
+
         NSLayoutConstraint.activate([
-            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stack.widthAnchor.constraint(equalToConstant: 300)
+            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
+            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
-        
     }
+
+    
     private func bindViewModel() {
         viewModel.onNavigate = { [weak self] destination in
             self?.handleNavigation(destination)
