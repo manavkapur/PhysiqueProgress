@@ -29,6 +29,7 @@ final class LoginViewController: UIViewController {
         view.backgroundColor = AppColors.background
         setupUI()
         bindViewModel()
+        loadLastEmail()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -80,6 +81,16 @@ final class LoginViewController: UIViewController {
         appleButton.heightAnchor.constraint(equalToConstant: 52).isActive = true
 
         activityIndicator.color = .white
+        
+        if let savedEmail = UserDefaults.standard.string(forKey: "lastLoginEmail") {
+            emailField.text = savedEmail
+            passwordField.becomeFirstResponder()
+        }
+        
+        emailField.textContentType = .username
+        passwordField.isSecureTextEntry = true
+        passwordField.textContentType = .password
+
 
         // MARK: - Card stack
         let stack = UIStackView(arrangedSubviews: [
@@ -89,6 +100,8 @@ final class LoginViewController: UIViewController {
             forgotButton,
             signupButton
         ])
+        
+        
 
         stack.axis = .vertical
         stack.spacing = 16
@@ -139,6 +152,10 @@ final class LoginViewController: UIViewController {
 
     private func bindViewModel() {
         viewModel.onLoginSuccess = { [weak self] in
+            
+            if let email = self?.emailField.text, !email.isEmpty {
+                UserDefaults.standard.set(email, forKey: "lastLoginEmail")
+            }
 
             UNUserNotificationCenter.current().getNotificationSettings { settings in
                 print("🔔 Authorization status:", settings.authorizationStatus.rawValue)
@@ -211,6 +228,12 @@ final class LoginViewController: UIViewController {
     }
     @objc private func appleLoginTapped() {
         AppleAuthManager.shared.startSignInWithAppleFlow()
+    }
+
+    private func loadLastEmail() {
+        if let savedEmail = UserDefaults.standard.string(forKey: "lastLoginEmail") {
+            emailField.text = savedEmail
+        }
     }
 
 }
