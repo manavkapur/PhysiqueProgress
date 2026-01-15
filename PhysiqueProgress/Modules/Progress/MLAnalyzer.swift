@@ -15,6 +15,12 @@ final class MLAnalyzer {
     private let silhouetteAnalyzer = SilhouetteAnalyzer()
     private let physiqueCalculator = PhysiqueRatioCalculator()
     private let physiqueScorer = PhysiqueScorer()
+    
+    private let coverageClassifier = BodyCoverageClassifier()
+
+    private let upperBodyAnalyzer = UpperBodySilhouetteAnalyzer()
+    private let upperBodyCalculator = UpperBodyShapeCalculator()
+    private let upperBodyScorer = UpperBodyScorer()
 
     // MARK: - Public
 
@@ -59,67 +65,142 @@ final class MLAnalyzer {
             return
         }
 
-        segmentationManager.generateMask(from: cgImage) { [weak self] mask in
-            guard let self, let mask else {
-                completion(nil)
-                return
-            }
+        // STEP 1 — Pose (can be nil)
+        detector.detectPose(in: image) { [weak self] observation in
+            guard let self else { completion(nil); return }
 
-            // ✅ STEP 1 — silhouette
-            guard let silhouette = self.silhouetteAnalyzer.analyze(mask: mask) else {
-                completion(nil)
-                return
-            }
+            // STEP 2 — Segmentation
+            self.segmentationManager.generateMask(from: cgImage) { [weak self] mask in
+                guard let self else { completion(nil); return }
 
-            // ✅ STEP 2 — physique ratios
-            let physiqueMetrics = self.physiqueCalculator.calculate(from: silhouette)
+                let hasMask = (mask != nil)
 
-            print("""
-            ----- PHYSIQUE SHAPE METRICS -----
-            V taper: \(physiqueMetrics.vTaper)
-            Waist/Hip: \(physiqueMetrics.waistHip)
-            FatIndex: \(physiqueMetrics.fatIndex)
-            TorsoRatio: \(physiqueMetrics.torsoRatio)
-            Shoulder/Thigh: \(physiqueMetrics.shoulderThigh)
-            ---------------------------------
-            """)
+                let coverage = self.coverageClassifier.classify(
+                    observation,
+                    hasBodyMask: hasMask
+                )
 
-            // ✅ STEP 3 — physique score
-            let physiqueScore = self.physiqueScorer.score(from: physiqueMetrics)
+                print("🧠 BODY COVERAGE DETECTED:", coverage)
 
-            // ✅ STEP 4 — pose
-            self.detector.detectPose(in: image) { observation in
-                guard let observation else {
+                switch coverage {
+
+                case .full:
+                    guard
+                        let mask,
+                        let observation
+                    else {
+                        completion(nil)
+                        return
+                    }
+
+                    self.runFullBodyPipeline(
+                        image: image,
+                        mask: mask,
+                        observation: observation,
+                        completion: completion
+                    )
+
+                case .upper:
+                    guard
+                        let mask,
+                        let observation
+                    else {
+                        completion(nil)
+                        return
+                    }
+
+                    self.runUpperBodyPipeline(
+                        image: image,
+                        mask: mask,
+                        observation: observation,
+                        completion: completion
+                    )
+
+                case .invalid:
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(
+                            name: .mlBodyInvalid,
+                            object: "Body not detected. Please capture a clearer image."
+                        )
+                    }
                     completion(nil)
-                    return
                 }
-
-                let poseMetrics = self.calculator.calculateMetrics(
-                    from: observation,
-                    physiqueScore: Double(physiqueScore)
-                )
-
-                // ✅ FINAL pose object
-                let finalPose = PoseMetrics(
-                    postureScore: poseMetrics.postureScore,
-                    symmetryScore: poseMetrics.symmetryScore,
-                    physiqueScore: Double(physiqueScore),
-                    stabilityScore: poseMetrics.stabilityScore,
-                    overallScore: poseMetrics.overallScore
-                )
-
-                // ✅ FINAL ML result
-                let result = MLAnalysisResult(
-                    pose: finalPose,
-                    shape: physiqueMetrics
-                )
-
-                completion(result)
             }
         }
     }
 
-    // MARK: - Averaging (pose only, keep last shape)
+    // MARK: - Full body pipeline
+
+    private func runFullBodyPipeline(
+        image: UIImage,
+        mask: CGImage,
+        observation: VNHumanBodyPoseObservation,
+        completion: @escaping (MLAnalysisResult?) -> Void
+    ) {
+
+        guard let silhouette = silhouetteAnalyzer.analyze(mask: mask) else {
+            completion(nil)
+            return
+        }
+
+        let physiqueMetrics = physiqueCalculator.calculate(from: silhouette)
+        let physiqueScore = physiqueScorer.score(from: physiqueMetrics)
+
+        let poseMetrics = calculator.calculateMetrics(
+            from: observation,
+            physiqueScore: Double(physiqueScore)
+        )
+
+        let finalPose = PoseMetrics(
+            postureScore: poseMetrics.postureScore,
+            symmetryScore: poseMetrics.symmetryScore,
+            physiqueScore: Double(physiqueScore),
+            stabilityScore: poseMetrics.stabilityScore,
+            overallScore: poseMetrics.overallScore
+        )
+
+        completion(.full(pose: finalPose, shape: physiqueMetrics))
+    }
+
+    // MARK: - Upper body pipeline
+
+    private func runUpperBodyPipeline(
+        image: UIImage,
+        mask: CGImage,
+        observation: VNHumanBodyPoseObservation,
+        completion: @escaping (MLAnalysisResult?) -> Void
+    ) {
+
+        guard let upper = upperBodyAnalyzer.analyze(mask: mask, pose: observation) else {
+            completion(nil)
+            return
+        }
+
+        guard let upperShape = upperBodyCalculator.calculate(from: upper) else {
+            print("❌ Upper body shape invalid (waist/chest missing)")
+            completion(nil)
+            return
+        }
+
+        let upperScore = upperBodyScorer.score(from: upperShape)
+
+        let poseMetrics = calculator.calculateMetrics(
+            from: observation,
+            physiqueScore: Double(upperScore)
+        )
+
+        let finalPose = PoseMetrics(
+            postureScore: poseMetrics.postureScore,
+            symmetryScore: poseMetrics.symmetryScore,
+            physiqueScore: Double(upperScore),
+            stabilityScore: poseMetrics.stabilityScore,
+            overallScore: poseMetrics.overallScore
+        )
+
+        completion(.upper(pose: finalPose, upper: upperShape))
+    }
+
+    // MARK: - Averaging
 
     private func average(_ results: [MLAnalysisResult]) -> MLAnalysisResult {
 
@@ -133,13 +214,17 @@ final class MLAnalyzer {
             overallScore: poses.map { $0.overallScore }.avg
         )
 
-        // shape does not need averaging (same image)
-        let shape = results.last!.shape
+        guard let last = results.last else {
+            fatalError("MLAnalyzer average called with empty results")
+        }
 
-        return MLAnalysisResult(
-            pose: averagedPose,
-            shape: shape
-        )
+        switch last {
+        case .full(_, let shape):
+            return .full(pose: averagedPose, shape: shape)
+
+        case .upper(_, let upper):
+            return .upper(pose: averagedPose, upper: upper)
+        }
     }
 
     // MARK: - Image normalization
