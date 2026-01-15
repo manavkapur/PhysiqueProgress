@@ -108,6 +108,13 @@ final class SilhouetteAnalyzer {
         let shoulder = bodyWidth(at: 0.25)
         let chest    = bodyWidth(at: 0.32)
         let waist    = bodyWidth(at: 0.55)
+        
+        // ❌ CRITICAL GUARD
+        if waist < 25 || chest < 40 || shoulder < 40 {
+            print("❌ Invalid upper-body slice — missing silhouette")
+            return nil
+        }
+        
         let hip      = bodyWidth(at: 0.63)
         let thigh    = bodyWidth(at: 0.72)
 

@@ -23,6 +23,15 @@ final class CameraViewController: UIViewController {
             "time": Date().timeIntervalSince1970
         ])
         
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleUpperBody),
+            name: .mlUpperBodyDetected,
+            object: nil
+        )
+
+
+        
         print("🚀 CameraViewController appeared")
         title = "Track Progress"
         view.backgroundColor = .systemBackground
@@ -33,9 +42,6 @@ final class CameraViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        #if DEBUG
-        testMLWithImage(named: "posereal")
-        #endif
     }
 
     private func setupUI() {
@@ -96,18 +102,19 @@ final class CameraViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    func testMLWithImage(named name: String) {
-        guard let image = UIImage(named: name) else {
-            showAlert("Test image not found")
-            return
-        }
-
-        MLAnalyzer().analyze(image: image) { [weak self] result in
-            guard let result else {
-                self?.showAlert("No ML metrics returned")
-                return
-            }
-            self?.showML(result.pose)
-        }
+    @objc private func handleMLBodyError(_ note: Notification) {
+        let message = note.object as? String ?? "Full body not visible."
+        showAlert(message)
     }
+    
+    @objc private func handleUpperBody(_ note: Notification) {
+        showAlert("Upper-body scan detected.\nFull physique analysis requires a full-body photo.")
+    }
+
+
 }
+
+extension Notification.Name {
+    static let mlBodyInvalid = Notification.Name("mlBodyInvalid")
+}
+
