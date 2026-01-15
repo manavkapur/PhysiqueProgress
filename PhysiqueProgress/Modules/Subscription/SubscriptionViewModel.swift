@@ -58,5 +58,7 @@ final class SubscriptionViewModel {
 
         }
     }
+    var onProductLoaded: ((String) -> Void)?
+
     
 }
