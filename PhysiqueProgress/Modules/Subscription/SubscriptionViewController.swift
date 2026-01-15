@@ -7,7 +7,6 @@
 //  SubscriptionViewController.swift
 //  PhysiqueProgress
 //
-
 import UIKit
 import StoreKit
 
@@ -18,11 +17,15 @@ final class SubscriptionViewController: UIViewController {
     private let scrollView = UIScrollView()
     private let contentView = UIView()
 
+    private let heroView = PremiumHeroView()
     private let premiumCard = PremiumUpgradeCard()
-    private let trialButton = PremiumCTAButton(title: "Start Your Free Trial")
+    private let trialButton = PremiumCTAButton(title: "Subscribe")
     private let restoreButton = UIButton(type: .system)
     private let disclaimerLabel = UILabel()
 
+    private let termsButton = UIButton(type: .system)
+    private let privacyButton = UIButton(type: .system)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Go Premium"
@@ -45,39 +48,51 @@ final class SubscriptionViewController: UIViewController {
         restoreButton.setTitleColor(.systemBlue, for: .normal)
         restoreButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
 
-        disclaimerLabel.text = "Cancel anytime. No charge if cancelled during trial."
+        disclaimerLabel.text = "Payment will be charged to your Apple ID. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Manage in App Store settings."
         disclaimerLabel.textColor = .secondaryLabel
         disclaimerLabel.font = .systemFont(ofSize: 12)
         disclaimerLabel.textAlignment = .center
         disclaimerLabel.numberOfLines = 0
+        
+        termsButton.setTitle("Terms of Use", for: .normal)
+        privacyButton.setTitle("Privacy Policy", for: .normal)
+
+        termsButton.titleLabel?.font = .systemFont(ofSize: 12)
+        privacyButton.titleLabel?.font = .systemFont(ofSize: 12)
+
+        termsButton.setTitleColor(.secondaryLabel, for: .normal)
+        privacyButton.setTitleColor(.secondaryLabel, for: .normal)
+
+        termsButton.addTarget(self, action: #selector(openTerms), for: .touchUpInside)
+        privacyButton.addTarget(self, action: #selector(openPrivacy), for: .touchUpInside)
+
+        
+        let legalStack = UIStackView(arrangedSubviews: [termsButton, privacyButton])
+        legalStack.distribution = .equalSpacing
+        legalStack.translatesAutoresizingMaskIntoConstraints = false
+        legalStack.axis = .horizontal
+        legalStack.spacing = 16
+        legalStack.alignment = .center
 
         trialButton.addTarget(self, action: #selector(subscribeTapped), for: .touchUpInside)
-        
+        restoreButton.addTarget(self, action: #selector(restoreTapped), for: .touchUpInside)
+
         trialButton.addTarget(self, action: #selector(pressDown), for: .touchDown)
         trialButton.addTarget(self, action: #selector(pressUp), for: [.touchUpInside, .touchCancel])
 
-        
-        restoreButton.addTarget(self, action: #selector(restoreTapped), for: .touchUpInside)
-        
-        let heroImageView = PremiumHeroView()
-        
-        heroImageView.layer.shadowColor = UIColor.systemYellow.cgColor
-        heroImageView.layer.shadowOpacity = 0.25
-        heroImageView.layer.shadowRadius = 30
-        heroImageView.layer.shadowOffset = .zero
-
-        
         let stack = UIStackView(arrangedSubviews: [
-            heroImageView,
+            heroView,
             premiumCard,
             trialButton,
             restoreButton,
-            disclaimerLabel
+            disclaimerLabel,
+            legalStack
         ])
 
         stack.axis = .vertical
         stack.spacing = 26
         stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.setCustomSpacing(12, after: disclaimerLabel)
 
         contentView.addSubview(stack)
 
@@ -102,16 +117,23 @@ final class SubscriptionViewController: UIViewController {
     }
 
     private func bind() {
+
+        viewModel.onProductsLoaded = { [weak self] in
+            guard let product = self?.viewModel.products.first else { return }
+
+            let priceText = "\(product.displayPrice) / month"
+
+            self?.premiumCard.setPrice(priceText)
+            self?.trialButton.setTitle("Subscribe for \(priceText)", for: .normal)
+        }
+
+
         viewModel.onPurchaseSuccess = { [weak self] in
             self?.showSuccess()
         }
 
         viewModel.onError = { [weak self] message in
             self?.showAlert(message)
-        }
-
-        viewModel.onProductLoaded = { [weak self] price in
-            self?.premiumCard.setPrice(price)
         }
     }
 
@@ -122,14 +144,14 @@ final class SubscriptionViewController: UIViewController {
     @objc private func restoreTapped() {
         viewModel.restore()
     }
-    
-    @objc func pressDown() {
+
+    @objc private func pressDown() {
         UIView.animate(withDuration: 0.12) {
             self.trialButton.transform = CGAffineTransform(scaleX: 0.97, y: 0.97)
         }
     }
 
-    @objc func pressUp() {
+    @objc private func pressUp() {
         UIView.animate(withDuration: 0.12) {
             self.trialButton.transform = .identity
         }
@@ -137,7 +159,7 @@ final class SubscriptionViewController: UIViewController {
 
     private func showSuccess() {
         let alert = UIAlertController(
-            title: "Premium Unlocked",
+            title: "Premium Unlocked 💪",
             message: "All premium features are now available.",
             preferredStyle: .alert
         )
@@ -154,4 +176,19 @@ final class SubscriptionViewController: UIViewController {
         alert.addAction(.init(title: "OK", style: .default))
         present(alert, animated: true)
     }
+    
+    @objc private func openTerms() {
+        openURL("https://manavkapur.github.io/physiqueprogress-legal/terms")
+    }
+
+    @objc private func openPrivacy() {
+        openURL("https://manavkapur.github.io/physiqueprogress-legal/privacy")
+    }
+
+    private func openURL(_ string: String) {
+        if let url = URL(string: string) {
+            UIApplication.shared.open(url)
+        }
+    }
+
 }
