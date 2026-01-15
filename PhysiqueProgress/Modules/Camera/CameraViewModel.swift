@@ -17,10 +17,17 @@ final class CameraViewModel {
     var onMLResult: ((PoseMetrics) -> Void)?
 
     func openCamera(from viewController: UIViewController) {
-        photoService.openImagePicker(from: viewController) { [weak self] image in
+        photoService.openCamera(from: viewController) { [weak self] image in
             self?.saveImage(image)
         }
     }
+
+    func openGallery(from viewController: UIViewController) {
+        photoService.openGallery(from: viewController) { [weak self] image in
+            self?.saveImage(image)
+        }
+    }
+
 
     private func saveImage(_ image: UIImage) {
         let fileName = "progress_\(Date().timeIntervalSince1970).jpg"

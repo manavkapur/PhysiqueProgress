@@ -10,16 +10,29 @@ final class PremiumButton: UIButton {
 
     init(title: String, action: Selector) {
         super.init(frame: .zero)
+
+        translatesAutoresizingMaskIntoConstraints = false
+
         setTitle("⭐︎ " + title, for: .normal)
         addTarget(nil, action: action, for: .touchUpInside)
 
-        backgroundColor = UIColor.systemYellow.withAlphaComponent(0.15)
-        setTitleColor(.systemYellow, for: .normal)
-        titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        backgroundColor = AppColors.primary.withAlphaComponent(0.18)
+        setTitleColor(AppColors.primary, for: .normal)
+        setTitleColor(AppColors.primary.withAlphaComponent(0.4), for: .highlighted)
 
-        layer.cornerRadius = 14
-        heightAnchor.constraint(equalToConstant: 48).isActive = true
+        titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
+        layer.cornerRadius = 16
+
+        heightAnchor.constraint(equalToConstant: 54).isActive = true
+
+        // Enterprise glow
+        layer.shadowColor = AppColors.primary.cgColor
+        layer.shadowOpacity = 0.35
+        layer.shadowRadius = 14
+        layer.shadowOffset = CGSize(width: 0, height: 6)
     }
 
-    required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
