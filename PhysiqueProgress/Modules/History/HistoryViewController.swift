@@ -2,8 +2,6 @@
 //  HistoryViewController.swift
 //  PhysiqueProgress
 //
-//  Created by Manav Kapur on 03/01/26.
-//
 
 import UIKit
 
@@ -11,37 +9,36 @@ final class HistoryViewController: UIViewController {
 
     private let viewModel = HistoryViewModel()
     private var collectionView: UICollectionView!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Progress History"
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = AppColors.background
         setupCollectionView()
         loadData()
     }
-    
+
     private func loadData() {
         viewModel.loadImages()
         collectionView.reloadData()
     }
-    
+
     private func setupCollectionView() {
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumInteritemSpacing = 8
-        layout.minimumLineSpacing = 8
 
         collectionView = UICollectionView(
             frame: .zero,
-            collectionViewLayout: layout
+            collectionViewLayout: createLayout()
         )
+
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .systemBackground
+        collectionView.backgroundColor = .clear
+        collectionView.showsVerticalScrollIndicator = false
 
         collectionView.dataSource = self
-        collectionView.delegate = self
+
         collectionView.register(
-            HistoryCell.self,
-            forCellWithReuseIdentifier: HistoryCell.reuseId
+            HistoryCardCell.self,
+            forCellWithReuseIdentifier: HistoryCardCell.reuseId
         )
 
         view.addSubview(collectionView)
@@ -49,47 +46,58 @@ final class HistoryViewController: UIViewController {
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8)
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
-    
+
+    private func createLayout() -> UICollectionViewLayout {
+
+        let item = NSCollectionLayoutItem(
+            layoutSize: .init(
+                widthDimension: .fractionalWidth(1),
+                heightDimension: .fractionalHeight(1)
+            )
+        )
+
+        item.contentInsets = .init(top: 6, leading: 6, bottom: 6, trailing: 6)
+
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: .init(
+                widthDimension: .fractionalWidth(1),
+                heightDimension: .fractionalWidth(0.72)
+            ),
+            subitem: item,
+            count: 2
+        )
+
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = .init(top: 16, leading: 10, bottom: 20, trailing: 10)
+
+        return UICollectionViewCompositionalLayout(section: section)
+    }
 }
 
+// MARK: - Data Source
 
 extension HistoryViewController: UICollectionViewDataSource {
 
-    func collectionView(
-        _ collectionView: UICollectionView,
-        numberOfItemsInSection section: Int
-    ) -> Int {
+    func collectionView(_ collectionView: UICollectionView,
+                        numberOfItemsInSection section: Int) -> Int {
         viewModel.numberOfItems
     }
 
-    func collectionView(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: HistoryCell.reuseId,
-            for: indexPath
-        ) as! HistoryCell
+    func collectionView(_ collectionView: UICollectionView,
+                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
-        let fileName = viewModel.imageName(at: indexPath.item)
-        cell.configure(with: fileName)
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: HistoryCardCell.reuseId,
+            for: indexPath
+        ) as! HistoryCardCell
+
+        let model = viewModel.item(at: indexPath.item)
+        cell.configure(item: model)
+
         return cell
     }
 }
-
-extension HistoryViewController: UICollectionViewDelegateFlowLayout {
-
-    func collectionView(
-        _ collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        sizeForItemAt indexPath: IndexPath
-    ) -> CGSize {
-        let width = (collectionView.frame.width - 8) / 2
-        return CGSize(width: width, height: width)
-    }
-}
-
