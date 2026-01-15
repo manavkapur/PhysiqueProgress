@@ -11,8 +11,10 @@ import FirebaseAnalytics
 final class CameraViewController: UIViewController {
     
     private let viewModel = CameraViewModel()
-    private let captureButton = UIButton(type: .system)
+    private let captureButton = PremiumButton(title: "Capture Photo", action: #selector(captureTapped))
+
     
+    private let featureCard = FeatureCardView()
 
 
     override func viewDidLoad() {
@@ -30,14 +32,13 @@ final class CameraViewController: UIViewController {
             object: nil
         )
 
-
-        
-        print("🚀 CameraViewController appeared")
         title = "Track Progress"
         view.backgroundColor = .systemBackground
         setupUI()
         bindViewModel()
     }
+    
+    
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -45,16 +46,26 @@ final class CameraViewController: UIViewController {
     }
 
     private func setupUI() {
-        captureButton.setTitle("Capture photo", for: .normal)
-        captureButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
+        featureCard.configure(
+            icon: "camera.fill",
+            title: "Capture Progress Photos",
+            subtitle: "Track your physique progress with consistent photos.",
+            image: UIImage(named: "pose_sample") // optional asset
+        )
+
         captureButton.addTarget(self, action: #selector(captureTapped), for: .touchUpInside)
-        captureButton.translatesAutoresizingMaskIntoConstraints = false
-        
+
+        view.addSubview(featureCard)
         view.addSubview(captureButton)
-        
+
         NSLayoutConstraint.activate([
-            captureButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            captureButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            featureCard.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
+            featureCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            featureCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+
+            captureButton.topAnchor.constraint(equalTo: featureCard.bottomAnchor, constant: 30),
+            captureButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
+            captureButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40)
         ])
     }
     
@@ -70,8 +81,24 @@ final class CameraViewController: UIViewController {
     }
     
     @objc private func captureTapped() {
-        viewModel.openCamera(from: self)
+        let sheet = EnterpriseActionSheet()
+        sheet.modalPresentationStyle = .overFullScreen
+        sheet.modalTransitionStyle = .crossDissolve
+
+        sheet.onCamera = { [weak self] in
+            guard let self = self else { return }
+            self.viewModel.openCamera(from: self)
+        }
+
+        sheet.onGallery = { [weak self] in
+            guard let self = self else { return }
+            self.viewModel.openGallery(from: self)
+        }
+
+        present(sheet, animated: true)
     }
+
+
     
     private func showAlert(_ message: String) {
         let alert = UIAlertController(
