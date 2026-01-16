@@ -31,6 +31,14 @@ final class CameraViewController: UIViewController {
             name: .mlUpperBodyDetected,
             object: nil
         )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleInvalidBody),
+            name: .mlBodyInvalid,
+            object: nil
+        )
+
 
         title = "Track Progress"
         view.backgroundColor = .systemBackground
@@ -136,6 +144,32 @@ final class CameraViewController: UIViewController {
     
     @objc private func handleUpperBody(_ note: Notification) {
         showAlert("Upper-body scan detected.\nFull physique analysis requires a full-body photo.")
+    }
+
+    @objc private func handleInvalidBody(_ note: Notification) {
+
+        let reason = note.object as? UpperBodyFailure ?? .unknown
+
+        let message: String
+
+        switch reason {
+        case .shoulderTooSmall:
+            message = "Move closer to the camera and keep shoulders fully visible."
+
+        case .chestTooSmall:
+            message = "Improve lighting and face the camera straight."
+
+        case .waistTooSmall:
+            message = "Stand farther from the camera so waist is visible."
+
+        case .segmentationWeak:
+            message = "Background too bright. Try darker background."
+
+        case .unknown:
+            message = "Body not detected clearly. Please retake the photo."
+        }
+
+        showAlert(message) // or alert / banner
     }
 
 
