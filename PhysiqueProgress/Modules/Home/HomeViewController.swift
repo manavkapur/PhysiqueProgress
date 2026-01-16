@@ -141,6 +141,11 @@ class HomeViewController: UIViewController {
     private func handleNavigation(
         _ destination: HomeViewModel.Destination
     ){
+        
+        let entries = ProgressRepository().loadAll()
+        let vm = ProgressAnalyticsViewModel(entries: entries)
+        let vc = ProgressAnalyticsViewController(viewModel: vm)
+
         switch destination {
             case .camera:
             navigationController?.pushViewController(
@@ -161,7 +166,7 @@ class HomeViewController: UIViewController {
             )
         case .analytics:
             navigationController?.pushViewController(
-                ProgressAnalyticsViewController(),
+                vc,
                 animated: true
             )
 

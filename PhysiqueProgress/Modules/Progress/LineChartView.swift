@@ -17,15 +17,20 @@ final class LineChartView: UIView {
         guard values.count > 1 else { return }
 
         let path = UIBezierPath()
+ 
         let maxValue = values.max() ?? 1
         let minValue = values.min() ?? 0
-        let range = max(maxValue - minValue, 1)
+
+        let padding = max((maxValue - minValue) * 0.6, 1.5)
+        let top = maxValue + padding
+        let bottom = minValue - padding
+        let range = max(top - bottom, 1)
 
         let stepX = rect.width / CGFloat(values.count - 1)
 
         for (index, value) in values.enumerated() {
             let x = CGFloat(index) * stepX
-            let yRatio = (value - minValue) / range
+            let yRatio = (value - bottom) / range
             let y = rect.height - (CGFloat(yRatio) * rect.height)
 
             index == 0

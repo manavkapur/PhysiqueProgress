@@ -95,5 +95,20 @@ final class ProgressViewModel {
     func postureProgress() -> [Double] {
         entries.map { $0.postureScore }
     }
+    
+    // MARK: - Coverage Filters
+
+    func fullBodyEntries() -> [ProgressEntry] {
+        entries.filter { $0.coverage == .full }
+    }
+
+    func upperBodyEntries() -> [ProgressEntry] {
+        entries.filter { $0.coverage == .upper }
+    }
+
+    func overallEntries() -> [ProgressEntry] {
+        entries   // full + upper together
+    }
+
 
 }
