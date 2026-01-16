@@ -82,9 +82,18 @@ final class CameraViewController: UIViewController {
             self?.showAlert(message)
         }
 
-        viewModel.onMLResult = { [weak self] pose in
+        viewModel.onMLResult = { pose in
             print("ML RESULT CALLBACK RECEIVED")
-            self?.showML(pose)
+//            self?.showML(pose)
+        }
+        
+        viewModel.onResultReady = { [weak self] entry, last in
+            guard let self else { return }
+
+            let vm = ResultViewModel(entry: entry, lastEntry: last)
+            let vc = ResultViewController(viewModel: vm)
+
+            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     

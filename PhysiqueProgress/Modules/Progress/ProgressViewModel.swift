@@ -48,17 +48,6 @@ final class ProgressViewModel {
         entries.map { $0.overallScore }
     }
 
-    func physiqueScores() -> [Double] {
-        entries.map { $0.physiqueScore }
-    }
-
-    func fatIndexProgress() -> [Double] {
-        entries.map { $0.fatIndex }
-    }
-
-    func vTaperProgress() -> [Double] {
-        entries.map { $0.vTaper }
-    }
 
     // MARK: - Progress insight
 
@@ -74,6 +63,37 @@ final class ProgressViewModel {
 
     func latestEntry() -> ProgressEntry? {
         entries.last
+    }
+    
+    func fullEntries() -> [ProgressEntry] {
+        entries.filter { $0.coverage == .full }
+    }
+
+    func upperEntries() -> [ProgressEntry] {
+        entries.filter { $0.coverage == .upper }
+    }
+
+    // 🥇 BODY PROGRESS (full only)
+    func bodyOverallScores() -> [Double] {
+        fullEntries().map { $0.overallScore }
+    }
+
+    func fatIndexProgress() -> [Double] {
+        fullEntries().map { $0.fatIndex }
+    }
+
+    // 🥈 PHYSIQUE AESTHETICS (both allowed)
+    func physiqueScores() -> [Double] {
+        entries.map { $0.physiqueScore }
+    }
+
+    func vTaperProgress() -> [Double] {
+        entries.map { $0.vTaper }
+    }
+
+    // 🥉 POSE QUALITY (both allowed)
+    func postureProgress() -> [Double] {
+        entries.map { $0.postureScore }
     }
 
 }

@@ -6,11 +6,18 @@
 //
 import Foundation
 
+enum BodyCoverageType: String, Codable {
+    case full
+    case upper
+}
+
 struct ProgressEntry: Codable {
 
     let id: String
     let imageFileName: String
     let date: Date
+    
+    let coverage: BodyCoverageType   // full or upper
 
     // USER / CAPTURE METADATA
     let height: Double

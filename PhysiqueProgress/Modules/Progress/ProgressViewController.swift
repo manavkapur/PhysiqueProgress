@@ -93,7 +93,7 @@ final class ProgressViewController: UIViewController {
             FirebaseAnalyticsService.shared.logPremiumAnalyticsViewed()
             chartView.isHidden = false
             tableTopToChart.isActive = true
-            chartView.values = viewModel.overallScores().reversed()
+            chartView.values = viewModel.bodyOverallScores().reversed()
         } else {
             FirebaseAnalyticsService.shared
                 .logFreeAnalyticsViewed()

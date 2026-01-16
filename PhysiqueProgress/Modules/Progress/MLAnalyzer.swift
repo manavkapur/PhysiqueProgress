@@ -21,6 +21,8 @@ final class MLAnalyzer {
     private let upperBodyAnalyzer = UpperBodySilhouetteAnalyzer()
     private let upperBodyCalculator = UpperBodyShapeCalculator()
     private let upperBodyScorer = UpperBodyScorer()
+    
+    private let captureEvaluator = CaptureQualityEvaluator()
 
     // MARK: - Public
 
@@ -71,8 +73,18 @@ final class MLAnalyzer {
 
             // STEP 2 — Segmentation
             self.segmentationManager.generateMask(from: cgImage) { [weak self] mask in
-                guard let self else { completion(nil); return }
+                
+                
 
+                guard let self else { completion(nil); return }
+                
+                let quality = self.captureEvaluator.evaluate(
+                    observation: observation,
+                    mask: mask
+                )
+
+                print("📸 Capture quality:", Int(quality.score))
+                
                 let hasMask = (mask != nil)
 
                 let coverage = self.coverageClassifier.classify(
