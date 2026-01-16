@@ -161,7 +161,7 @@ class HomeViewController: UIViewController {
             )
         case .analytics:
             navigationController?.pushViewController(
-                ProgressViewController(),
+                ProgressAnalyticsViewController(),
                 animated: true
             )
 

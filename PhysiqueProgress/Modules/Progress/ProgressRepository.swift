@@ -77,7 +77,9 @@ final class ProgressRepository {
             "waistHip": entry.waistHip,
             "fatIndex": entry.fatIndex,
             "torsoRatio": entry.torsoRatio,
-            "shoulderThigh": entry.shoulderThigh
+            "shoulderThigh": entry.shoulderThigh,
+            
+            "coverage": entry.coverage.rawValue,            
         ]
 
         Firestore.firestore()

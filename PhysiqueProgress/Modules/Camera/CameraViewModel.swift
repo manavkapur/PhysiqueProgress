@@ -6,15 +6,23 @@
 //
 
 import UIKit
+import Foundation
 
 final class CameraViewModel {
 
     private let photoService = PhotoCaptureService()
     private let mlAnalyzer = MLAnalyzer()
     private let progressRepo = ProgressRepository()
-    
+
+    // MARK: - Outputs
+
     var onError: ((String) -> Void)?
     var onMLResult: ((PoseMetrics) -> Void)?
+    
+    // 🔥 NEW — Result screen trigger
+    var onResultReady: ((ProgressEntry, ProgressEntry?) -> Void)?
+
+    // MARK: - Camera
 
     func openCamera(from viewController: UIViewController) {
         photoService.openCamera(from: viewController) { [weak self] image in
@@ -28,6 +36,7 @@ final class CameraViewModel {
         }
     }
 
+    // MARK: - Save + Analyze
 
     private func saveImage(_ image: UIImage) {
         let fileName = "progress_\(Date().timeIntervalSince1970).jpg"
@@ -44,7 +53,8 @@ final class CameraViewModel {
 
             switch result {
 
-            // FULL BODY PIPELINE
+            // MARK: - FULL BODY PIPELINE
+
             case .full(let pose, let shape):
 
                 let week = Calendar.current.component(.weekOfYear, from: Date())
@@ -53,6 +63,7 @@ final class CameraViewModel {
                     id: UUID().uuidString,
                     imageFileName: fileName,
                     date: Date(),
+                    coverage: .full,
 
                     height: 0,
                     weight: nil,
@@ -76,26 +87,60 @@ final class CameraViewModel {
                 )
 
                 DispatchQueue.main.async {
+                    let last = self.progressRepo.loadAll().last   // ⚠️ before save
                     self.progressRepo.save(entry)
+
                     self.onMLResult?(pose)
+                    self.onResultReady?(entry, last)
                 }
 
-            // 🪞 UPPER BODY PIPELINE
+            // MARK: - UPPER BODY PIPELINE
+
             case .upper(let pose, let upper):
 
-                DispatchQueue.main.async {
-                    self.onMLResult?(pose)
-                }
+                let week = Calendar.current.component(.weekOfYear, from: Date())
 
-                NotificationCenter.default.post(
-                    name: .mlUpperBodyDetected,
-                    object: upper
+                let entry = ProgressEntry(
+                    id: UUID().uuidString,
+                    imageFileName: fileName,
+                    date: Date(),
+                    coverage: .upper,
+
+                    height: 0,
+                    weight: nil,
+                    poseQuality: (pose.postureScore + pose.stabilityScore) / 2,
+
+                    overallScore: pose.overallScore,
+                    physiqueScore: pose.physiqueScore,
+
+                    postureScore: pose.postureScore,
+                    symmetryScore: pose.symmetryScore,
+                    stabilityScore: pose.stabilityScore,
+
+                    // 🔥 mapped upper → physique slots
+                    vTaper: Double(upper.chestWaist),
+                    waistHip: 0,
+                    fatIndex: 0,
+                    torsoRatio: Double(upper.torsoDominance),
+                    shoulderThigh: Double(upper.shoulderChest),
+
+                    weekOfYear: week,
+                    engineVersion: PhysiqueEngine.version
                 )
+
+                DispatchQueue.main.async {
+                    let last = self.progressRepo.loadAll().last
+                    self.progressRepo.save(entry)
+
+                    self.onMLResult?(pose)
+                    self.onResultReady?(entry, last)
+                }
             }
         }
     }
-
 }
+
+// MARK: - Engine
 
 enum PhysiqueEngine {
     static let version = "1.0.0"
