@@ -1,6 +1,21 @@
 import UIKit
 import Vision
 
+enum UpperBodyFailure: String {
+    case shoulderTooSmall
+    case chestTooSmall
+    case waistTooSmall
+    case segmentationWeak
+    case unknown
+}
+
+enum UpperBodyAnalysisResult {
+    case success(UpperBodySilhouetteMetrics)
+    case failure(UpperBodyFailure)
+}
+
+
+
 struct UpperBodySilhouetteMetrics {
 
     let shoulderWidth: CGFloat
@@ -16,12 +31,14 @@ final class UpperBodySilhouetteAnalyzer {
     func analyze(
         mask: CGImage,
         pose: VNHumanBodyPoseObservation
-    ) -> UpperBodySilhouetteMetrics? {
+    ) -> UpperBodyAnalysisResult {
 
         guard let pixelData = mask.dataProvider?.data,
               let data = CFDataGetBytePtr(pixelData),
               let points = try? pose.recognizedPoints(.all)
-        else { return nil }
+        else {
+            return .failure(.segmentationWeak)
+        }
 
         let width = mask.width
         let height = mask.height
@@ -100,7 +117,9 @@ final class UpperBodySilhouetteAnalyzer {
         guard
             let ls = points[.leftShoulder],
             let rs = points[.rightShoulder]
-        else { return nil }
+        else {
+            return .failure(.unknown)
+        }
 
         let rawShoulderY = (1 - (ls.y + rs.y) / 2) * CGFloat(height)
         let shoulderY = min(max(Int(rawShoulderY), 0), height - 1)
@@ -149,10 +168,21 @@ final class UpperBodySilhouetteAnalyzer {
         let chest    = bodyWidth(at: chestY)
 
 
-        if waist < 25 || chest < 40 || shoulder < 40 {
-            print("❌ Invalid upper-body silhouette")
-            return nil
+        if shoulder < 30 {
+            print("❌ Shoulder slice too small:", shoulder)
+            return .failure(.shoulderTooSmall)
         }
+
+        if chest < 30 {
+            print("❌ Chest slice too small:", chest)
+            return .failure(.chestTooSmall)
+        }
+
+        if waist < 20 {
+            print("❌ Waist slice too small:", waist)
+            return .failure(.waistTooSmall)
+        }
+
 
         // MARK: - Areas
 
@@ -161,7 +191,9 @@ final class UpperBodySilhouetteAnalyzer {
 
         let torsoStart = min(shoulderY + Int(CGFloat(height) * 0.04), height - 1)
         let torsoEnd   = min(shoulderY + Int(CGFloat(height) * 0.17), height - 1)
-        if torsoEnd <= torsoStart { return nil }
+        if torsoEnd <= torsoStart {
+            return .failure(.segmentationWeak)
+        }
 
         for y in shoulderY..<torsoEnd {
             let row = data + y * bytesPerRow
@@ -173,12 +205,13 @@ final class UpperBodySilhouetteAnalyzer {
             }
         }
 
-        return UpperBodySilhouetteMetrics(
+        return .success( UpperBodySilhouetteMetrics(
             shoulderWidth: shoulder,
             chestWidth: chest,
             upperWaistWidth: waist,
             upperBodyArea: upperPixels,
             upperTorsoArea: torsoPixels
         )
+                         )
     }
 }

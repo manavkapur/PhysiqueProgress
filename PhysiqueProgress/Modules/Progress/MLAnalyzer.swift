@@ -171,33 +171,55 @@ final class MLAnalyzer {
         completion: @escaping (MLAnalysisResult?) -> Void
     ) {
 
-        guard let upper = upperBodyAnalyzer.analyze(mask: mask, pose: observation) else {
+        let upperResult = upperBodyAnalyzer.analyze(mask: mask, pose: observation)
+
+        switch upperResult {
+
+        case .success(let upper):
+
+            guard let upperShape = upperBodyCalculator.calculate(from: upper) else {
+                print("❌ Upper body shape invalid (waist/chest missing)")
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(
+                        name: .mlBodyInvalid,
+                        object: UpperBodyFailure.unknown
+                    )
+                }
+                completion(nil)
+                return
+            }
+
+            let upperScore = upperBodyScorer.score(from: upperShape)
+
+            let poseMetrics = calculator.calculateMetrics(
+                from: observation,
+                physiqueScore: Double(upperScore)
+            )
+
+            let finalPose = PoseMetrics(
+                postureScore: poseMetrics.postureScore,
+                symmetryScore: poseMetrics.symmetryScore,
+                physiqueScore: Double(upperScore),
+                stabilityScore: poseMetrics.stabilityScore,
+                overallScore: poseMetrics.overallScore
+            )
+
+            completion(.upper(pose: finalPose, upper: upperShape))
+
+
+        case .failure(let reason):
+
+            print("❌ Upper body analysis failed:", reason)
+
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: .mlBodyInvalid,
+                    object: reason
+                )
+            }
+
             completion(nil)
-            return
         }
-
-        guard let upperShape = upperBodyCalculator.calculate(from: upper) else {
-            print("❌ Upper body shape invalid (waist/chest missing)")
-            completion(nil)
-            return
-        }
-
-        let upperScore = upperBodyScorer.score(from: upperShape)
-
-        let poseMetrics = calculator.calculateMetrics(
-            from: observation,
-            physiqueScore: Double(upperScore)
-        )
-
-        let finalPose = PoseMetrics(
-            postureScore: poseMetrics.postureScore,
-            symmetryScore: poseMetrics.symmetryScore,
-            physiqueScore: Double(upperScore),
-            stabilityScore: poseMetrics.stabilityScore,
-            overallScore: poseMetrics.overallScore
-        )
-
-        completion(.upper(pose: finalPose, upper: upperShape))
     }
 
     // MARK: - Averaging
