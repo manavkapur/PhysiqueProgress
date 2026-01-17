@@ -12,6 +12,9 @@
 		33076D662F05D583003AA3C1 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 33076D652F05D583003AA3C1 /* FirebaseMessaging */; };
 		33076EB92F0B4CEA003AA3C1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 33076EB82F0B4CEA003AA3C1 /* FirebaseAnalytics */; };
 		33076EE32F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 33076EDC2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		33E235052F1AA128003F2ACD /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E234EB2F1AA0D8003F2ACD /* WidgetKit.framework */; };
+		33E235062F1AA128003F2ACD /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E234ED2F1AA0D9003F2ACD /* SwiftUI.framework */; };
+		33E235132F1AA129003F2ACD /* PhysiqueWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 33E235042F1AA128003F2ACD /* PhysiqueWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -21,6 +24,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 33076EDB2F0B86CD003AA3C1;
 			remoteInfo = PhysiqueProgressNotificationService;
+		};
+		33E235112F1AA129003F2ACD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 33076D312F059069003AA3C1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 33E235032F1AA128003F2ACD;
+			remoteInfo = PhysiqueWidgetExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -32,6 +42,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				33076EE32F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex in Embed Foundation Extensions */,
+				33E235132F1AA129003F2ACD /* PhysiqueWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -41,6 +52,10 @@
 /* Begin PBXFileReference section */
 		33076D392F059069003AA3C1 /* PhysiqueProgress.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhysiqueProgress.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33076EDC2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PhysiqueProgressNotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		33E234EB2F1AA0D8003F2ACD /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		33E234ED2F1AA0D9003F2ACD /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		33E235042F1AA128003F2ACD /* PhysiqueWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PhysiqueWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		33E235182F1AA44D003F2ACD /* PhysiqueWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PhysiqueWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -57,6 +72,13 @@
 				Info.plist,
 			);
 			target = 33076EDB2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */;
+		};
+		33E235172F1AA129003F2ACD /* Exceptions for "PhysiqueWidget" folder in "PhysiqueWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 33E235032F1AA128003F2ACD /* PhysiqueWidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -75,6 +97,14 @@
 				33076EE72F0B86CE003AA3C1 /* Exceptions for "PhysiqueProgressNotificationService" folder in "PhysiqueProgressNotificationService" target */,
 			);
 			path = PhysiqueProgressNotificationService;
+			sourceTree = "<group>";
+		};
+		33E235072F1AA128003F2ACD /* PhysiqueWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				33E235172F1AA129003F2ACD /* Exceptions for "PhysiqueWidget" folder in "PhysiqueWidgetExtension" target */,
+			);
+			path = PhysiqueWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -98,14 +128,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33E235012F1AA128003F2ACD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33E235062F1AA128003F2ACD /* SwiftUI.framework in Frameworks */,
+				33E235052F1AA128003F2ACD /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		33076D302F059069003AA3C1 = {
 			isa = PBXGroup;
 			children = (
+				33E235182F1AA44D003F2ACD /* PhysiqueWidgetExtension.entitlements */,
 				33076D3B2F059069003AA3C1 /* PhysiqueProgress */,
 				33076EDD2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */,
+				33E235072F1AA128003F2ACD /* PhysiqueWidget */,
+				33E234EA2F1AA0D8003F2ACD /* Frameworks */,
 				33076D3A2F059069003AA3C1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,8 +157,18 @@
 			children = (
 				33076D392F059069003AA3C1 /* PhysiqueProgress.app */,
 				33076EDC2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex */,
+				33E235042F1AA128003F2ACD /* PhysiqueWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		33E234EA2F1AA0D8003F2ACD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				33E234EB2F1AA0D8003F2ACD /* WidgetKit.framework */,
+				33E234ED2F1AA0D9003F2ACD /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -135,6 +187,7 @@
 			);
 			dependencies = (
 				33076EE22F0B86CD003AA3C1 /* PBXTargetDependency */,
+				33E235122F1AA129003F2ACD /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				33076D3B2F059069003AA3C1 /* PhysiqueProgress */,
@@ -172,6 +225,28 @@
 			productReference = 33076EDC2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		33E235032F1AA128003F2ACD /* PhysiqueWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33E235142F1AA129003F2ACD /* Build configuration list for PBXNativeTarget "PhysiqueWidgetExtension" */;
+			buildPhases = (
+				33E235002F1AA128003F2ACD /* Sources */,
+				33E235012F1AA128003F2ACD /* Frameworks */,
+				33E235022F1AA128003F2ACD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				33E235072F1AA128003F2ACD /* PhysiqueWidget */,
+			);
+			name = PhysiqueWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = PhysiqueWidgetExtension;
+			productReference = 33E235042F1AA128003F2ACD /* PhysiqueWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -179,7 +254,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					33076D382F059069003AA3C1 = {
@@ -187,6 +262,9 @@
 					};
 					33076EDB2F0B86CD003AA3C1 = {
 						CreatedOnToolsVersion = 16.4;
+					};
+					33E235032F1AA128003F2ACD = {
+						CreatedOnToolsVersion = 26.2;
 					};
 				};
 			};
@@ -209,6 +287,7 @@
 			targets = (
 				33076D382F059069003AA3C1 /* PhysiqueProgress */,
 				33076EDB2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */,
+				33E235032F1AA128003F2ACD /* PhysiqueWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -222,6 +301,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		33076EDA2F0B86CD003AA3C1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33E235022F1AA128003F2ACD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -245,6 +331,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33E235002F1AA128003F2ACD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -252,6 +345,11 @@
 			isa = PBXTargetDependency;
 			target = 33076EDB2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService */;
 			targetProxy = 33076EE12F0B86CD003AA3C1 /* PBXContainerItemProxy */;
+		};
+		33E235122F1AA129003F2ACD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 33E235032F1AA128003F2ACD /* PhysiqueWidgetExtension */;
+			targetProxy = 33E235112F1AA129003F2ACD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -493,6 +591,70 @@
 			};
 			name = Release;
 		};
+		33E235152F1AA129003F2ACD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PhysiqueWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LZRFT54CXM;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PhysiqueWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PhysiqueWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.apertix.PhysiqueProgress.PhysiqueWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		33E235162F1AA129003F2ACD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PhysiqueWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LZRFT54CXM;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PhysiqueWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PhysiqueWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.apertix.PhysiqueProgress.PhysiqueWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -519,6 +681,15 @@
 			buildConfigurations = (
 				33076EE52F0B86CE003AA3C1 /* Debug */,
 				33076EE62F0B86CE003AA3C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		33E235142F1AA129003F2ACD /* Build configuration list for PBXNativeTarget "PhysiqueWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33E235152F1AA129003F2ACD /* Debug */,
+				33E235162F1AA129003F2ACD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
