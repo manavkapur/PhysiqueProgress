@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             "source": "xcode",
             "time": Date().timeIntervalSince1970
         ])
-        
+        WidgetRefreshManager.refreshTodayWidget()
         return true
     }
     

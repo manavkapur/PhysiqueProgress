@@ -2,22 +2,18 @@
 //  HomeViewController.swift
 //  PhysiqueProgress
 //
-//  Created by Manav Kapur on 03/01/26.
-//
 
 import UIKit
 import FirebaseAuth
+
 
 
 class HomeViewController: UIViewController {
     
     private let viewModel = HomeViewModel()
     
-    private let titleLabel = UILabel()
-    private let logoView = UIImageView()
-
-    private let card = CardView()
-    private let stack = UIStackView()
+    // 🔥 NEW — Today plan card
+    private let todayPlanCard = TodayPlanCardView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,19 +21,33 @@ class HomeViewController: UIViewController {
         view.backgroundColor = .systemBackground
         setupUI()
         bindViewModel()
+        
+        // ✅ LIVE refresh when plan changes
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(reloadTodayCard),
+            name: .todayPlanUpdated,
+            object: nil
+        )
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        todayPlanCard.configure()   // 🔄 refresh when coming back
     }
     
     private func setupUI() {
 
-        let logo = UIImageView(image: UIImage(named: "AppLogo"))
-        logo.contentMode = .scaleAspectFit
-        logo.heightAnchor.constraint(equalToConstant: 90).isActive = true
+        // ---------- TODAY PLAN CARD (replaces logo area) ----------
+        
+        todayPlanCard.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(todayPlanCard)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(openDailyPlan))
+        todayPlanCard.addGestureRecognizer(tap)
+        todayPlanCard.isUserInteractionEnabled = true
 
-        let titleLabel = UILabel()
-        titleLabel.text = "PhysiqueProgress"
-        titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
-        titleLabel.textColor = .white
-        titleLabel.textAlignment = .center
+        // ---------- ACTION CARDS ----------
 
         let track = ActionCardView(
             icon: UIImage(systemName: "camera.fill"),
@@ -74,27 +84,46 @@ class HomeViewController: UIViewController {
             subtitle: "Sign out of your account"
         )
         logout.backgroundColor = UIColor.systemRed.withAlphaComponent(0.15)
-
         logout.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
 
         let stack = UIStackView(arrangedSubviews: [
-            logo, titleLabel,
             track, history, analytics, premium, logout
         ])
 
         stack.axis = .vertical
         stack.spacing = 18
         stack.translatesAutoresizingMaskIntoConstraints = false
-
         view.addSubview(stack)
 
+
+
+        // ---------- LAYOUT ----------
+
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
+            
+            // Today plan card
+            todayPlanCard.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            todayPlanCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            todayPlanCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            todayPlanCard.heightAnchor.constraint(equalToConstant: 150),
+
+            // Menu stack
+            stack.topAnchor.constraint(equalTo: todayPlanCard.bottomAnchor, constant: 24),
             stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
     }
 
+    // MARK: - Today Plan Navigation
+    
+    @objc private func openDailyPlan() {
+        navigationController?.pushViewController(
+            PlanEditorViewController(),
+            animated: true
+        )
+    }
+
+    // MARK: - Bind VM
     
     private func bindViewModel() {
         viewModel.onNavigate = { [weak self] destination in
@@ -111,7 +140,8 @@ class HomeViewController: UIViewController {
             reason: "Unlock your progress history"
         ) { [weak self] in
             self?.viewModel.didSelectHistory()
-        }    }
+        }
+    }
     
     @objc private func subscriptionTapped() {
         viewModel.didSelectSubscription()
@@ -170,7 +200,6 @@ class HomeViewController: UIViewController {
                 animated: true
             )
 
-        
         case .logout:
             logout()
         }
@@ -178,7 +207,6 @@ class HomeViewController: UIViewController {
     
     private func logout() {
         PushManager.shared.clearTokenOnLogout()
-
         try? Auth.auth().signOut()
         
         guard let sceneDelegate =
@@ -204,14 +232,17 @@ class HomeViewController: UIViewController {
                         message: "Biometric verification required to access this feature.",
                         preferredStyle: .alert
                     )
-
                     alert.addAction(UIAlertAction(title: "OK", style: .default))
                     self.present(alert, animated: true)
                 }
             }
         }
-
     }
-
+    @objc private func reloadTodayCard() {
+        todayPlanCard.configure()
+    }
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 
 }
