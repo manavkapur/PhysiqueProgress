@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Firebase
+GoogleService-Info.plist
+
+# Xcode
+xcuserdata/
+DerivedData/
+*.xcworkspace
+
