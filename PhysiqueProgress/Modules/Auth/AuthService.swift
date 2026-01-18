@@ -8,6 +8,9 @@
 import FirebaseAuth
 
 final class AuthService {
+
+    private let progressRepo = ProgressRepository()
+
     func login(
         email: String,
         password: String,
@@ -17,24 +20,30 @@ final class AuthService {
             if let error {
                 completion(.failure(error))
             } else {
+
+                // 🔥 MIGRATE guest → user progress
+                self.progressRepo.migrateGuestIfNeeded()
+
                 completion(.success(()))
             }
-            
         }
     }
-    
+
     func signup(
         email: String,
         password: String,
         completion: @escaping (Result<Void, Error>) -> Void
     ) {
-        Auth.auth().createUser(withEmail: email, password: password) { result, error in
+        Auth.auth().createUser(withEmail: email, password: password) { _, error in
             if let error {
                 completion(.failure(error))
                 return
             }
 
-            // 🔥 THIS IS STEP 4 — SEND VERIFICATION MAIL
+            // 🔥 MIGRATE guest → user progress
+            self.progressRepo.migrateGuestIfNeeded()
+
+            // 🔥 SEND VERIFICATION MAIL
             Auth.auth().currentUser?.sendEmailVerification { error in
                 if let error {
                     print("❌ Verification email error:", error.localizedDescription)
@@ -44,7 +53,6 @@ final class AuthService {
                     completion(.success(()))
                 }
             }
-
         }
     }
 
@@ -61,8 +69,6 @@ final class AuthService {
     func resendVerification(completion: @escaping (Error?) -> Void) {
         Auth.auth().currentUser?.sendEmailVerification(completion: completion)
     }
-    
-    // AuthService.swift
 
     func sendPasswordReset(
         email: String,
@@ -76,6 +82,4 @@ final class AuthService {
             }
         }
     }
-
-
 }

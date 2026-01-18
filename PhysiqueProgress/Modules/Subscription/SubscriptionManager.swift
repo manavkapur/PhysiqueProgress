@@ -67,6 +67,7 @@ final class SubscriptionManager {
     // Load products from App Store
     func loadProducts() async throws {
         products = try await Product.products(for: productIDs)
+        print("🛒 Loaded products:", products.map { $0.id })
     }
 
     // Purchase flow

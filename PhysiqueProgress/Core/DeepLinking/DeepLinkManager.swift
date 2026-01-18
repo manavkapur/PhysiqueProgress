@@ -31,7 +31,9 @@ final class DeepLinkManager {
     // MARK: - Core router
 
     private func route(_ route: DeepLinkRoute, window: UIWindow?) {
-
+        let entries = ProgressRepository().loadAll()
+        let vm = ProgressAnalyticsViewModel(entries: entries)
+        let vc = ProgressAnalyticsViewController(viewModel: vm)
         guard
             let nav = window?.rootViewController as? UINavigationController
         else { return }
@@ -39,7 +41,7 @@ final class DeepLinkManager {
         switch route {
 
         case .progress:
-            nav.pushViewController(ProgressViewController(), animated: true)
+            nav.pushViewController(vc, animated: true)
 
         case .premium:
             nav.pushViewController(SubscriptionViewController(), animated: true)

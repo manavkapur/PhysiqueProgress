@@ -12,8 +12,7 @@ final class LocalFileManager {
     
     static let shared = LocalFileManager()
     private init() {}
-    
-    
+        
     private let folderName = "PhysiquePhotos"
     
     private func photosDirectory() -> URL {

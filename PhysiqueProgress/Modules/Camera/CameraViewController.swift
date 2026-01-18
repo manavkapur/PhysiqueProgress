@@ -11,6 +11,9 @@ import FirebaseAnalytics
 final class CameraViewController: UIViewController {
     
     private let viewModel = CameraViewModel()
+
+    private var loadingView: LoadingOverlayView?
+    
     private let captureButton = PremiumButton(title: "Capture Photo", action: #selector(captureTapped))
 
     
@@ -19,7 +22,14 @@ final class CameraViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        viewModel.onPremiumRequired = { [weak self] in
+            guard let self else { return }
+
+            self.hideLoading()   // ✅ IMPORTANT
+
+            let vc = SubscriptionViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
         Analytics.logEvent("test_event", parameters: [
             "source": "camera",
             "time": Date().timeIntervalSince1970
@@ -78,7 +88,13 @@ final class CameraViewController: UIViewController {
     }
     
     private func bindViewModel() {
+        
+        viewModel.onProcessingStarted = { [weak self] in
+            self?.showLoading()
+        }
+        
         viewModel.onError = { [weak self] message in
+            self?.hideLoading()
             self?.showAlert(message)
         }
 
@@ -89,11 +105,12 @@ final class CameraViewController: UIViewController {
         
         viewModel.onResultReady = { [weak self] entry, last in
             guard let self else { return }
-
+            self.hideLoading()
             let vm = ResultViewModel(entry: entry, lastEntry: last)
             let vc = ResultViewController(viewModel: vm)
 
             self.navigationController?.pushViewController(vc, animated: true)
+            
         }
     }
     
@@ -104,12 +121,16 @@ final class CameraViewController: UIViewController {
 
         sheet.onCamera = { [weak self] in
             guard let self = self else { return }
+            
             self.viewModel.openCamera(from: self)
+
         }
 
         sheet.onGallery = { [weak self] in
             guard let self = self else { return }
+            
             self.viewModel.openGallery(from: self)
+
         }
 
         present(sheet, animated: true)
@@ -179,6 +200,24 @@ final class CameraViewController: UIViewController {
         }
 
         showAlert(message) // or alert / banner
+    }
+    private func showLoading() {
+        let loader = LoadingOverlayView(text: "Analyzing your physique…")
+        loadingView = loader
+
+        view.addSubview(loader)
+
+        NSLayoutConstraint.activate([
+            loader.topAnchor.constraint(equalTo: view.topAnchor),
+            loader.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            loader.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            loader.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+
+    private func hideLoading() {
+        loadingView?.removeFromSuperview()
+        loadingView = nil
     }
 
 

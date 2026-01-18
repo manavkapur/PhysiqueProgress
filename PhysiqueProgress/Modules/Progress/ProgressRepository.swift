@@ -12,7 +12,10 @@ import FirebaseAuth
 
 
 final class ProgressRepository {
-    private let fileName = "progress_metrics.json"
+    private var fileName: String {
+        let uid = Auth.auth().currentUser?.uid ?? "guest"
+        return "progress_\(uid).json"
+    }
     
     
     func save(_ entry: ProgressEntry){
@@ -42,9 +45,9 @@ final class ProgressRepository {
     
     private func fileURL() -> URL {
         let document = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        
         return document.appendingPathComponent(fileName)
     }
+
     
     private func syncToFirebase(_ entry: ProgressEntry) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
@@ -89,5 +92,24 @@ final class ProgressRepository {
             .document(entry.id) // 👈 better than addDocument
             .setData(data, merge: true)
     }
+    func migrateGuestIfNeeded() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+
+        let document = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let guestURL = document.appendingPathComponent("progress_guest.json")
+        let userURL = document.appendingPathComponent("progress_\(uid).json")
+
+        if FileManager.default.fileExists(atPath: guestURL.path),
+           !FileManager.default.fileExists(atPath: userURL.path) {
+
+            do {
+                try FileManager.default.moveItem(at: guestURL, to: userURL)
+                print("✅ Migrated guest progress → user:", uid)
+            } catch {
+                print("❌ Failed to migrate guest progress:", error.localizedDescription)
+            }
+        }
+    }
+
 
 }

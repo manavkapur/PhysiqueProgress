@@ -40,24 +40,20 @@ final class PremiumUpgradeCard: UIView {
         subtitle.font = .systemFont(ofSize: 15)
         subtitle.textColor = .secondaryLabel
 
-        priceLabel.text = "$9.99/month after 7-day free trial"
-        priceLabel.font = .systemFont(ofSize: 13, weight: .medium)
-        priceLabel.textColor = .tertiaryLabel
+
 
         featuresStack.axis = .vertical
         featuresStack.spacing = 14
 
         [
-            "Unlimited progress photos",
-            "Advanced physique metrics",
-            "Premium AI analysis",
-            "Exclusive future features"
+            "No more daily limit of 2 photos",
+            "Unlimited progress photos"
         ].forEach {
             featuresStack.addArrangedSubview(PremiumFeatureRow(text: $0))
         }
 
         let stack = UIStackView(arrangedSubviews: [
-            title, subtitle, featuresStack, priceLabel
+            title, subtitle, featuresStack
         ])
 
         stack.axis = .vertical
