@@ -7,6 +7,8 @@
 
 import UIKit
 import Foundation
+import FirebaseCrashlytics
+
 
 extension Notification.Name {
     static let todayPlanUpdated = Notification.Name("todayPlanUpdated")
@@ -75,6 +77,7 @@ final class PlanEditorViewController: UIViewController {
 
     @objc private func saveTapped() {
 
+        Crashlytics.crashlytics().log("User saved workout & meal plan")
         UserPlanStore.saveWorkout(workoutView.exportPlan())
         UserPlanStore.saveMeals(mealView.exportPlan())
 

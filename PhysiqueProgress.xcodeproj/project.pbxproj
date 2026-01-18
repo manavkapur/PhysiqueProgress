@@ -12,6 +12,7 @@
 		33076D662F05D583003AA3C1 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 33076D652F05D583003AA3C1 /* FirebaseMessaging */; };
 		33076EB92F0B4CEA003AA3C1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 33076EB82F0B4CEA003AA3C1 /* FirebaseAnalytics */; };
 		33076EE32F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 33076EDC2F0B86CD003AA3C1 /* PhysiqueProgressNotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		33561C442F1CFD9A00F0A3BC /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 33561C432F1CFD9A00F0A3BC /* FirebaseCrashlytics */; };
 		33E235052F1AA128003F2ACD /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E234EB2F1AA0D8003F2ACD /* WidgetKit.framework */; };
 		33E235062F1AA128003F2ACD /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E234ED2F1AA0D9003F2ACD /* SwiftUI.framework */; };
 		33E235132F1AA129003F2ACD /* PhysiqueWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 33E235042F1AA128003F2ACD /* PhysiqueWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -116,6 +117,7 @@
 			files = (
 				33076D662F05D583003AA3C1 /* FirebaseMessaging in Frameworks */,
 				33076D622F05D583003AA3C1 /* FirebaseAuth in Frameworks */,
+				33561C442F1CFD9A00F0A3BC /* FirebaseCrashlytics in Frameworks */,
 				33076EB92F0B4CEA003AA3C1 /* FirebaseAnalytics in Frameworks */,
 				33076D642F05D583003AA3C1 /* FirebaseFirestore in Frameworks */,
 			);
@@ -182,6 +184,7 @@
 				33076D362F059069003AA3C1 /* Frameworks */,
 				33076D372F059069003AA3C1 /* Resources */,
 				33076EE82F0B86CE003AA3C1 /* Embed Foundation Extensions */,
+				33561C452F1CFE2D00F0A3BC /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -198,6 +201,7 @@
 				33076D632F05D583003AA3C1 /* FirebaseFirestore */,
 				33076D652F05D583003AA3C1 /* FirebaseMessaging */,
 				33076EB82F0B4CEA003AA3C1 /* FirebaseAnalytics */,
+				33561C432F1CFD9A00F0A3BC /* FirebaseCrashlytics */,
 			);
 			productName = PhysiqueProgress;
 			productReference = 33076D392F059069003AA3C1 /* PhysiqueProgress.app */;
@@ -316,6 +320,31 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		33561C452F1CFE2D00F0A3BC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		33076D352F059069003AA3C1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -362,6 +391,7 @@
 				CODE_SIGN_ENTITLEMENTS = PhysiqueProgress/PhysiqueProgress.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = LZRFT54CXM;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PhysiqueProgress/Info.plist;
@@ -394,6 +424,7 @@
 				CODE_SIGN_ENTITLEMENTS = PhysiqueProgress/PhysiqueProgress.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = LZRFT54CXM;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PhysiqueProgress/Info.plist;
@@ -727,6 +758,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 33076D602F05D583003AA3C1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
+		};
+		33561C432F1CFD9A00F0A3BC /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 33076D602F05D583003AA3C1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

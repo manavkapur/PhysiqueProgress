@@ -6,6 +6,7 @@
 //
 import Vision
 import UIKit
+import FirebaseCrashlytics
 
 final class PoseDetector {
 
@@ -14,6 +15,10 @@ final class PoseDetector {
         completion: @escaping (VNHumanBodyPoseObservation?) -> Void
     ) {
         guard let cgImage = image.cgImage else {
+            let err = NSError(domain: "ImageError", code: 1001, userInfo: [
+                NSLocalizedDescriptionKey: "cgImage was nil"
+            ])
+            Crashlytics.crashlytics().record(error: err)
             completion(nil)
             return
         }

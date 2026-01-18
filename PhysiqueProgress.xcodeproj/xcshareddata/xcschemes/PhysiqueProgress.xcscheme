@@ -55,6 +55,10 @@
             argument = "-FIRAnalyticsDebugEnabled "
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-FIRDebugEnabled "
+            isEnabled = "YES">
+         </CommandLineArgument>
       </CommandLineArguments>
       <StoreKitConfigurationFileReference
          identifier = "../../PhysiqueProgress/Modules/Subscription/PhysiqueProgress.storekit">

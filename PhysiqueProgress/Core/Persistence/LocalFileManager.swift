@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseCrashlytics
 
 final class LocalFileManager {
     
@@ -38,6 +39,7 @@ final class LocalFileManager {
             try data.write(to: fileURL)
             return fileURL
         } catch {
+            Crashlytics.crashlytics().record(error: error)
             print("Image save failed ", error)
             return nil
         }

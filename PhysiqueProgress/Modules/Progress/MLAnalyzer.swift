@@ -5,6 +5,7 @@
 
 import UIKit
 import Vision
+import FirebaseCrashlytics
 
 final class MLAnalyzer {
 
@@ -37,6 +38,20 @@ final class MLAnalyzer {
         func runPass(_ index: Int) {
             singleAnalyze(image: stableImage) { result in
                 guard let result else {
+                    
+                    Crashlytics.crashlytics().log("MLAnalyzer: result was nil in pass \(index)")
+                    Crashlytics.crashlytics().setCustomValue(index, forKey: "ml_pass")
+
+                    let err = NSError(
+                        domain: "MLAnalyzer",
+                        code: 1001,
+                        userInfo: [
+                            NSLocalizedDescriptionKey: "singleAnalyze returned nil result"
+                        ]
+                    )
+
+                    Crashlytics.crashlytics().record(error: err)
+                    
                     DispatchQueue.main.async { completion(nil) }
                     return
                 }
@@ -63,6 +78,10 @@ final class MLAnalyzer {
     ) {
 
         guard let cgImage = image.cgImage else {
+            let err = NSError(domain: "ImageError", code: 1001, userInfo: [
+                NSLocalizedDescriptionKey: "cgImage was nil"
+            ])
+            Crashlytics.crashlytics().record(error: err)
             completion(nil)
             return
         }
