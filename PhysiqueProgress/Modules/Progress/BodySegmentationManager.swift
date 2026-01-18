@@ -5,6 +5,7 @@
 
 import Vision
 import UIKit
+import FirebaseCrashlytics
 
 final class BodySegmentationManager {
 
@@ -49,6 +50,7 @@ final class BodySegmentationManager {
 
             } catch {
                 print("❌ Segmentation failed:", error)
+                Crashlytics.crashlytics().record(error: error)
                 completion(nil)
             }
         }

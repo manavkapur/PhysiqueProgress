@@ -6,6 +6,7 @@
 //
 
 import BackgroundTasks
+import FirebaseCrashlytics
 
 final class BackgroundTaskManager {
 
@@ -31,6 +32,7 @@ final class BackgroundTaskManager {
             print("✅ BG task scheduled")
         } catch {
             print("❌ BG task schedule failed:", error)
+            Crashlytics.crashlytics().record(error: error)
         }
     }
 

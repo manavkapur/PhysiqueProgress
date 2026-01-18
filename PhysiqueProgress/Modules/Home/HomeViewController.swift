@@ -5,7 +5,7 @@
 
 import UIKit
 import FirebaseAuth
-
+import FirebaseCrashlytics
 
 
 class HomeViewController: UIViewController {
@@ -16,6 +16,9 @@ class HomeViewController: UIViewController {
     private let todayPlanCard = TodayPlanCardView()
     
     override func viewDidLoad() {
+//        Crashlytics.crashlytics().log("🔥 Manual test crash from PhysiqueProgress")
+//        Crashlytics.crashlytics().sendUnsentReports()
+//        fatalError("🔥 Forced Crash for Crashlytics")
         super.viewDidLoad()
         title = "PhysiqueProgress"
         view.backgroundColor = .systemBackground
