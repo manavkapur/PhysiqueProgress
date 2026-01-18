@@ -7,7 +7,6 @@
 
 enum DeepLinkRoute {
     case progress
-    case premium
     case history
     case unknown
 }

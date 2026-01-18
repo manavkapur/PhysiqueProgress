@@ -10,7 +10,7 @@ final class HomeViewModel {
     enum Destination {
         case camera
         case history
-        case subscription
+//        case subscription
         case logout
         case analytics
         
@@ -26,9 +26,9 @@ final class HomeViewModel {
         onNavigate?(.history)
     }
     
-    func didSelectSubscription() {
-        onNavigate?(.subscription)
-    }
+//    func didSelectSubscription() {
+//        onNavigate?(.subscription)
+//    }
     
     func didSelectLogout() {
         onNavigate?(.logout)

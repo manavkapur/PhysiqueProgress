@@ -17,8 +17,6 @@ struct DeepLink {
         switch path {
         case "/progress":
             route = .progress
-        case "/premium":
-            route = .premium
         case "/history":
             route = .history
         default:
@@ -37,8 +35,6 @@ struct DeepLink {
         switch host {
         case "progress":
             route = .progress
-        case "premium":
-            route = .premium
         case "history":
             route = .history
         default:

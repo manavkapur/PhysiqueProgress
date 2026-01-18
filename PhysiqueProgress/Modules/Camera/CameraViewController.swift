@@ -22,14 +22,6 @@ final class CameraViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewModel.onPremiumRequired = { [weak self] in
-            guard let self else { return }
-
-            self.hideLoading()   // ✅ IMPORTANT
-
-            let vc = SubscriptionViewController()
-            self.navigationController?.pushViewController(vc, animated: true)
-        }
         Analytics.logEvent("test_event", parameters: [
             "source": "camera",
             "time": Date().timeIntervalSince1970

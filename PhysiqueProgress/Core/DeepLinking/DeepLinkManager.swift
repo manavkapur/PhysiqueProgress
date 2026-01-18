@@ -43,9 +43,6 @@ final class DeepLinkManager {
         case .progress:
             nav.pushViewController(vc, animated: true)
 
-        case .premium:
-            nav.pushViewController(SubscriptionViewController(), animated: true)
-
         case .history:
             nav.pushViewController(HistoryViewController(), animated: true)
 

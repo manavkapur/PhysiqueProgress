@@ -22,15 +22,15 @@ final class FirebaseAnalyticsService {
         Analytics.logEvent("premium_restore", parameters: nil)
     }
 
-    func logSubscriptionActive() {
-        Analytics.setUserProperty("true", forName: "is_premium")
-        Analytics.logEvent("premium_active", parameters: nil)
-    }
+//    func logSubscriptionActive() {
+//        Analytics.setUserProperty("true", forName: "is_premium")
+//        Analytics.logEvent("premium_active", parameters: nil)
+//    }
 
-    func logSubscriptionInactive() {
-        Analytics.setUserProperty("false", forName: "is_premium")
-        Analytics.logEvent("premium_inactive", parameters: nil)
-    }
+//    func logSubscriptionInactive() {
+//        Analytics.setUserProperty("false", forName: "is_premium")
+//        Analytics.logEvent("premium_inactive", parameters: nil)
+//    }
 
     func logPremiumAnalyticsViewed() {
         Analytics.logEvent("premium_analytics_viewed", parameters: nil)

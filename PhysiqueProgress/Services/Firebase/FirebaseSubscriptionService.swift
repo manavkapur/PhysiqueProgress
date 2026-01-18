@@ -5,11 +5,6 @@
 //  Created by Manav Kapur on 05/01/26.
 
 
-//
-//  FirebaseSubscriptionService.swift
-//  PhysiqueProgress
-//
-
 import FirebaseFirestore
 import FirebaseAnalytics
 
