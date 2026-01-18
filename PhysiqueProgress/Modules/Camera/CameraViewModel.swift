@@ -13,6 +13,9 @@ final class CameraViewModel {
     private let photoService = PhotoCaptureService()
     private let mlAnalyzer = MLAnalyzer()
     private let progressRepo = ProgressRepository()
+    var onProcessingStarted: (() -> Void)?
+
+    var onPremiumRequired: (() -> Void)?
 
     // MARK: - Outputs
 
@@ -25,20 +28,30 @@ final class CameraViewModel {
     // MARK: - Camera
 
     func openCamera(from viewController: UIViewController) {
-        photoService.openCamera(from: viewController) { [weak self] image in
-            self?.saveImage(image)
+        checkAccessBeforeCapture {
+            self.photoService.openCamera(from: viewController) { [weak self] image in
+                self?.saveImage(image)
+            }
         }
     }
 
     func openGallery(from viewController: UIViewController) {
-        photoService.openGallery(from: viewController) { [weak self] image in
-            self?.saveImage(image)
+        checkAccessBeforeCapture {
+            self.photoService.openGallery(from: viewController) { [weak self] image in
+                self?.saveImage(image)
+            }
         }
     }
+
 
     // MARK: - Save + Analyze
 
     private func saveImage(_ image: UIImage) {
+        
+        DispatchQueue.main.async {
+            self.onProcessingStarted?()   // ✅ START LOADER HERE
+        }
+        
         let fileName = "progress_\(Date().timeIntervalSince1970).jpg"
 
         guard LocalFileManager.shared.saveImage(image, fileName: fileName) != nil else {
@@ -138,6 +151,42 @@ final class CameraViewModel {
             }
         }
     }
+    private func todayPhotoCount() -> Int {
+        let all = progressRepo.loadAll()
+        let today = Calendar.current
+
+        return all.filter {
+            today.isDateInToday($0.date)
+        }.count
+    }
+    
+    private func checkAccessBeforeCapture(
+        action: @escaping () -> Void
+    ) {
+        Task { [weak self] in
+            guard let self else { return }
+
+            let isPremium = await SubscriptionManager.shared.hasPremiumAccess()
+            let countToday = todayPhotoCount()
+
+            let allowed = PremiumGate.canAddNewPhoto(
+                isPremium: isPremium,
+                todayPhotoCount: countToday
+            )
+
+            await MainActor.run {
+                if allowed {
+                    action()
+                } else {
+                    self.onPremiumRequired?()
+                }
+            }
+        }
+    }
+
+
+
+
 }
 
 // MARK: - Engine
