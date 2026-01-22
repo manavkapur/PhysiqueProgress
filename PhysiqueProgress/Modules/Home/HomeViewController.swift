@@ -68,16 +68,23 @@ class HomeViewController: UIViewController {
         )
         analytics.addTarget(self, action: #selector(AnalyticsTapped), for: .touchUpInside)
 
-        let logout = ActionCardView(
-            icon: UIImage(systemName: "power"),
-            title: "Logout",
-            subtitle: "Sign out of your account"
+//        let logout = ActionCardView(
+//            icon: UIImage(systemName: "power"),
+//            title: "Logout",
+//            subtitle: "Sign out of your account"
+//        )
+//        logout.backgroundColor = UIColor.systemRed.withAlphaComponent(0.15)
+//        logout.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
+        
+        let settings = ActionCardView(
+            icon: UIImage(systemName: "gearshape.fill"),
+            title: "Settings",
+            subtitle: "Account, privacy and app settings"
         )
-        logout.backgroundColor = UIColor.systemRed.withAlphaComponent(0.15)
-        logout.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
+        settings.addTarget(self, action: #selector(settingsTapped), for: .touchUpInside)
 
         let stack = UIStackView(arrangedSubviews: [
-            track, history, analytics, logout
+            track, history, analytics, settings
         ])
 
         stack.axis = .vertical
@@ -126,6 +133,10 @@ class HomeViewController: UIViewController {
     @objc private func logoutTapped() {
         viewModel.didSelectLogout()
     }
+    @objc private func settingsTapped() {
+        navigationController?.pushViewController(SettingsViewController(), animated: true)
+    }
+
 
     private func handleNavigation(_ destination: HomeViewModel.Destination) {
 

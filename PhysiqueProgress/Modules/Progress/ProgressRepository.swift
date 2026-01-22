@@ -110,6 +110,29 @@ final class ProgressRepository {
             }
         }
     }
+    
+    func deleteAllLocalProgress() {
+        let document = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+        // delete guest + user files just in case
+        let guestURL = document.appendingPathComponent("progress_guest.json")
+
+        if FileManager.default.fileExists(atPath: guestURL.path) {
+            try? FileManager.default.removeItem(at: guestURL)
+        }
+
+        if let uid = Auth.auth().currentUser?.uid {
+            let userURL = document.appendingPathComponent("progress_\(uid).json")
+            if FileManager.default.fileExists(atPath: userURL.path) {
+                try? FileManager.default.removeItem(at: userURL)
+            }
+        }
+    }
+
+    func deleteLocalUserFile() {
+        let url = fileURL()
+        try? FileManager.default.removeItem(at: url)
+    }
 
 
 }
